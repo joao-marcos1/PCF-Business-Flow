@@ -12,16 +12,10 @@
     "@material-ui/core": "^4.3.3",
     "@material-ui/icons": "^4.2.1",
     "@types/node": "^10.12.18",
-    "@types/powerapps-component-framework": "1.1.0",
-    "file-system": "^2.2.2",
-    "fs": "0.0.1-security",
-    "read-xml": "^3.0.0",
-    "xml2js": "^0.4.23",
-    "xml2js-xpath": "^0.12.0"
+    "@types/powerapps-component-framework": "1.1.0"
   },
   "devDependencies": {
-    "@types/xml2js": "^0.4.8",
-    "pcf-scripts": "^1.6.6",
+    "pcf-scripts": "^0.4.3",
     "pcf-start": "^0.4.3"
   }
 }

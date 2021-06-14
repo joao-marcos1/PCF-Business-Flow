@@ -30,12 +30,7 @@ export default function VerticalLinearStepper(props:any) {
   const classes = useStyles();
   const intialValue = props.activeStep;
   const [activeStep, setActiveStep] = React.useState(intialValue);
-  const [sampleData,setSampleData] = React.useState([]);
   const steps = props.steps;
-
-  React.useEffect(()=>{
-  
-  },[])
 
   function handleNext() {
     setActiveStep((prevActiveStep: any) => prevActiveStep + 1);
@@ -47,8 +42,6 @@ export default function VerticalLinearStepper(props:any) {
     setActiveStep((prevActiveStep : any)=> prevActiveStep - 1);
     props.refreshData(activeStep - 1);
   }
-
-  
 
   function handleReset() {
     setActiveStep(0);
@@ -69,7 +62,7 @@ export default function VerticalLinearStepper(props:any) {
                     onClick={handleBack}
                     className={classes.button}
                   >
-                    Back to School
+                    Back
                   </Button>
                   <Button
                     variant="contained"

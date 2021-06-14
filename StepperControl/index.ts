@@ -11,8 +11,9 @@ import vertical from './vertical';
 class GetSteps {
 	flowType: any;
 	steps: any[];
-	activeStep: number;
-	refreshData: (value: any) => void;
+	activeStep : number;
+	refreshData : (value:any) => void;
+	
 }
 
 export class StepperControl implements ComponentFramework.StandardControl<IInputs, IOutputs> {
@@ -34,8 +35,6 @@ export class StepperControl implements ComponentFramework.StandardControl<IInput
 
 	}
 
-
-
 	/**
 	 * Used to initialize the control instance. Controls can kick off remote server calls and other initialization actions here.
 	 * Data-set values are not initialized here, use updateView.
@@ -51,62 +50,56 @@ export class StepperControl implements ComponentFramework.StandardControl<IInput
 		this._refreshData = this.refreshData.bind(this);
 
 		console.log(context.parameters.stages.raw);
-		this._stages = context.parameters.stages.attributes;
-		this._onLoadValue = context.parameters.stages.raw ? context.parameters.stages.raw : this._stages.DefaultValue != -1 ? context.parameters.stages.raw : 0;
+		this._stages  = context.parameters.stages.attributes;
+        this._onLoadValue  = context.parameters.stages.raw ? context.parameters.stages.raw  : this._stages.DefaultValue != -1 ? context.parameters.stages.raw: 0 ;
 		//this._OptionDefaultValue = this._stages.DefaultValue != -1 ? context.parameters.stages.raw: 0 ;
 
 		this._container = document.createElement("div");
 		container.appendChild(this._container);
-
-		// console.log(this._stages.raw);
-		// console.log(this._stages.DefaultValue);
-		// var parseString = require('xml2js').parseString;
-		// var xml = "<root>Hello xml2js!</root>"
-		// parseString(xml, function (err, result) {
-		// 	console.log("Idhar dekh",result);
-		// });
-		if (!this._stages.Options) return;
+		
+		console.log(this._stages.raw);
+		console.log(this._stages.DefaultValue);
+		if(!this._stages.Options) return;
 		this._props = new GetSteps();
 		this._props.steps = [];
 
 		//Linear Basic Bar , Linear Basic Dotted , Linear Basic Customized 
 		// Vertical , NonLinear
-		this._props.flowType = context.parameters.flowTypeProperty && context.parameters.flowTypeProperty.raw ? context.parameters.flowTypeProperty.raw : "Linear Basic Bar";
-
-		this._props.refreshData = this._refreshData;
-
+		this._props.flowType = context.parameters.flowTypeProperty && context.parameters.flowTypeProperty.raw ? context.parameters.flowTypeProperty.raw:"Linear Basic Bar";
+	
+		this._props.refreshData = this._refreshData ;
+	
 		let count = 0;
-		this._stages.Options.map((e: any) => {
+		this._stages.Options.map((e:any)=>{
 			this._props.steps.push(e.Label);
-			e.Value == this._onLoadValue ? this._OptionSetSelectedValue = count : 0;
+			e.Value ==  this._onLoadValue  ? this._OptionSetSelectedValue = count : 0;
 			count++;
 		});
-		this._props.activeStep = this._OptionSetSelectedValue ? this._OptionSetSelectedValue : 0;
+		this._props.activeStep = this._OptionSetSelectedValue ? this._OptionSetSelectedValue : 0 ;
 
 		ReactDOM.render(
 			React.createElement(
 				React.Fragment,
 				null,
-				React.createElement(this._props.flowType == "Vertical" ? vertical : this._props.flowType == "NonLinear" ? Nonlinear : Stepper, this._props)
+				React.createElement( this._props.flowType== "Vertical" ? vertical : this._props.flowType== "NonLinear" ? Nonlinear : Stepper  , this._props)
 			),
 			this._container
-		);
-	
+		); 
 	}
 
-	refreshData(value: any) {
-		var selectedstep = this._stages.Options[value];
-		this._OptionSetSelectedValue = selectedstep.Value;
-		this._notifyOutputChanged();
+	refreshData(value:any){
+	   var selectedstep = this._stages.Options[value];
+	   this._OptionSetSelectedValue = selectedstep.Value;
+	this._notifyOutputChanged ();
 	}
-
+ 
 	/**							
 	 * Called when any value in the property bag has changed. This includes field values, data-sets, global values such as container height and width, offline status, control metadata values such as label, visible, etc.
 	 * @param context The entire property bag available to control via Context Object; It contains values as set up by the customizer mapped to names defined in the manifest, as well as utility functions
 	 */
 	public updateView(context: ComponentFramework.Context<IInputs>): void {
-		//	Stepper.handleNext();
-		console.log(this._stages.raw);
+	//	Stepper.handleNext();
+	console.log(this._stages.raw);
 	}
 
 	/** 
@@ -115,7 +108,7 @@ export class StepperControl implements ComponentFramework.StandardControl<IInput
 	 */
 	public getOutputs(): IOutputs {
 		return {
-			stages: this._OptionSetSelectedValue
+         stages : this._OptionSetSelectedValue
 		};
 	}
 
