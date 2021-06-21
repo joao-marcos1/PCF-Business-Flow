@@ -26,35 +26,34 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-export default function VerticalLinearStepper(props:any) {
+export default function VerticalLinearStepper(props: any) {
   const classes = useStyles();
-  const intialValue = props.activeStep;
-  const [activeStep, setActiveStep] = React.useState(intialValue);
+  const [activeStep, setActiveStep] = React.useState(0);
   const steps = props.steps;
-
+console.table(props);
   function handleNext() {
     setActiveStep((prevActiveStep: any) => prevActiveStep + 1);
-    props.refreshData(activeStep + 1);
-
+    props.refreshData();
   }
 
   function handleBack() {
-    setActiveStep((prevActiveStep : any)=> prevActiveStep - 1);
-    props.refreshData(activeStep - 1);
+    setActiveStep((prevActiveStep: any) => prevActiveStep - 1);
+    props.refreshData();
   }
 
   function handleReset() {
     setActiveStep(0);
-    props.refreshData(0);
+    props.refreshData();
   }
-
+console.table(steps);
   return (
     <div className={classes.root}>
       <Stepper activeStep={activeStep} orientation="vertical">
-        {steps.map((label: any, index: any) => (
-          <Step key={label}>
-            <StepLabel>{label}</StepLabel>
+        {steps.map(({ name, desc }: any) => (
+          <Step key={name}>
+            <StepLabel>{name}</StepLabel>
             <StepContent>
+              <Typography>{desc}</Typography>
               <div className={classes.actionsContainer}>
                 <div>
                   <Button

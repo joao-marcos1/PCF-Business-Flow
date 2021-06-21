@@ -2,7 +2,7 @@
   "version": 3,
   "targets": {
     ".NETFramework,Version=v4.6.2": {
-      "Microsoft.PowerApps.MSBuild.Pcf/0.3.4": {
+      "Microsoft.PowerApps.MSBuild.Pcf/1.7.2": {
         "type": "package",
         "build": {
           "build/Microsoft.PowerApps.MSBuild.Pcf.props": {},
@@ -11,7 +11,7 @@
       }
     },
     ".NETFramework,Version=v4.6.2/win": {
-      "Microsoft.PowerApps.MSBuild.Pcf/0.3.4": {
+      "Microsoft.PowerApps.MSBuild.Pcf/1.7.2": {
         "type": "package",
         "build": {
           "build/Microsoft.PowerApps.MSBuild.Pcf.props": {},
@@ -20,7 +20,7 @@
       }
     },
     ".NETFramework,Version=v4.6.2/win-x64": {
-      "Microsoft.PowerApps.MSBuild.Pcf/0.3.4": {
+      "Microsoft.PowerApps.MSBuild.Pcf/1.7.2": {
         "type": "package",
         "build": {
           "build/Microsoft.PowerApps.MSBuild.Pcf.props": {},
@@ -29,7 +29,7 @@
       }
     },
     ".NETFramework,Version=v4.6.2/win-x86": {
-      "Microsoft.PowerApps.MSBuild.Pcf/0.3.4": {
+      "Microsoft.PowerApps.MSBuild.Pcf/1.7.2": {
         "type": "package",
         "build": {
           "build/Microsoft.PowerApps.MSBuild.Pcf.props": {},
@@ -39,61 +39,62 @@
     }
   },
   "libraries": {
-    "Microsoft.PowerApps.MSBuild.Pcf/0.3.4": {
-      "sha512": "/v/QTsiz3E7Rrbc2tz+VY9GC5KsaEtZlTnSNdaRSb7EGR7/SiTCzFVlGHXReO9pX8dmKudxAId36/tu01Ea/Fg==",
+    "Microsoft.PowerApps.MSBuild.Pcf/1.7.2": {
+      "sha512": "0rjzEmUQZC45iTL6yrTCKn0JEc9WqTUhoh/4092LkCmSmMexQiaJk6KniT5UCBi0q+tkpnzz4VsL9zcSTF4xXg==",
       "type": "package",
-      "path": "microsoft.powerapps.msbuild.pcf/0.3.4",
+      "path": "microsoft.powerapps.msbuild.pcf/1.7.2",
       "files": [
+        ".nupkg.metadata",
         ".signature.p7s",
         "3rdPartyNotice.txt",
         "LICENSE.txt",
         "build/Microsoft.PowerApps.MSBuild.Pcf.props",
         "build/Microsoft.PowerApps.MSBuild.Pcf.targets",
-        "microsoft.powerapps.msbuild.pcf.0.3.4.nupkg.sha512",
+        "microsoft.powerapps.msbuild.pcf.1.7.2.nupkg.sha512",
         "microsoft.powerapps.msbuild.pcf.nuspec"
       ]
     }
   },
   "projectFileDependencyGroups": {
     ".NETFramework,Version=v4.6.2": [
-      "Microsoft.PowerApps.MSBuild.Pcf >= 0.*"
+      "Microsoft.PowerApps.MSBuild.Pcf >= 1.*"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Divya\\.nuget\\packages\\": {}
+    "C:\\Users\\1\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "F:\\Practice\\CRM\\PCF\\stepper\\stepper.pcfproj",
+      "projectUniqueName": "E:\\UpWork\\GA Solutions\\pcf-business-process-flow\\stepper.pcfproj",
       "projectName": "stepper",
-      "projectPath": "F:\\Practice\\CRM\\PCF\\stepper\\stepper.pcfproj",
-      "packagesPath": "C:\\Users\\Divya\\.nuget\\packages\\",
-      "outputPath": "F:\\Practice\\CRM\\PCF\\stepper\\obj\\",
+      "projectPath": "E:\\UpWork\\GA Solutions\\pcf-business-process-flow\\stepper.pcfproj",
+      "packagesPath": "C:\\Users\\1\\.nuget\\packages\\",
+      "outputPath": "E:\\UpWork\\GA Solutions\\pcf-business-process-flow\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Divya\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\1\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net462"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net462": {
+          "targetAlias": "net462",
           "projectReferences": {}
         }
       }
     },
     "frameworks": {
       "net462": {
+        "targetAlias": "net462",
         "dependencies": {
           "Microsoft.PowerApps.MSBuild.Pcf": {
             "target": "Package",
-            "version": "[0.*, )"
+            "version": "[1.*, )"
           }
         }
       }
