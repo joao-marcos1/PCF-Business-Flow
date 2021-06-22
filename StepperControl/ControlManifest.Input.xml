@@ -1,11 +1,13 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <manifest>
   <control namespace="PCFNamespace2" constructor="StepperControl" version="0.0.8" display-name-key="Test3" description-key="Updated Stepper Control WCS Edition" control-type="standard">
     <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
     <property name="flowTypeProperty" display-name-key="SubProcessType" description-key="Sub Business Process" of-type="SingleLine.Text" usage="input" required="true" />
- <property name="entity" display-name-key="entity_Display_Key" description-key="entity_Desc_Key" of-type="SingleLine.Text" usage="input" required="true" />
-  <property name="attributeProperty" display-name-key="attribute_Display_Key" description-key="attribute_Desc_Key" of-type="SingleLine.Text" usage="input" required="true" />
-  <property name="stages" display-name-key="stages_Display_Key" description-key="stages_Desc_Key" of-type="OptionSet" usage="bound" required="true" />
+    <property name="entityProperty" display-name-key="entity_Display_Key" description-key="entity_Desc_Key" of-type="SingleLine.Text" usage="input" required="true" />
+    <property name="attributeStepName" display-name-key="StepName" description-key="Step Name" of-type="SingleLine.Text" usage="input" required="true" />
+    <property name="attributeStepDesc" display-name-key="StepDescription" description-key="Step Description" of-type="SingleLine.Text" usage="input" required="true" />
+    <property name="attributeStepOrder" display-name-key="StepOrder" description-key="Step Order" of-type="SingleLine.Text" usage="input" required="true" />
+    <property name="stages" display-name-key="stages_Display_Key" description-key="stages_Desc_Key" of-type="OptionSet" usage="bound" required="true" />
     <!-- 
       Property node's of-type attribute can be of-type-group attribute. 
       Example:

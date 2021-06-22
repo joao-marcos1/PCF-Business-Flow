@@ -12,7 +12,6 @@ import StepConnector from '@material-ui/core/StepConnector';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import { StepIconProps } from '@material-ui/core/StepIcon';
-import xml2js from "xml2js";
 import { any } from 'prop-types';
 
 import Nonlinear from './nonlinear';
