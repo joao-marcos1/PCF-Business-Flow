@@ -4,9 +4,9 @@
     <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
     <property name="flowTypeProperty" display-name-key="SubProcessType" description-key="Sub Business Process" of-type="SingleLine.Text" usage="input" required="true" />
     <property name="entityProperty" display-name-key="entity_Display_Key" description-key="entity_Desc_Key" of-type="SingleLine.Text" usage="input" required="true" />
-    <property name="attributeStage" display-name-key="Stage" description-key="Stage" of-type="SingleLine.Text" usage="input" required="true" />
     <property name="attributeStepName" display-name-key="StepName" description-key="Step Name" of-type="SingleLine.Text" usage="input" required="true" />
     <property name="attributeStepDesc" display-name-key="StepDescription" description-key="Step Description" of-type="SingleLine.Text" usage="input" required="true" />
+    <property name="attributeStepOrder" display-name-key="StepOrder" description-key="Step Order" of-type="SingleLine.Text" usage="input" required="true" />
     <property name="stages" display-name-key="stages_Display_Key" description-key="stages_Desc_Key" of-type="OptionSet" usage="bound" required="true" />
     <!-- 
       Property node's of-type attribute can be of-type-group attribute. 

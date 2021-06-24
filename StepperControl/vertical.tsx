@@ -30,7 +30,7 @@ export default function VerticalLinearStepper(props: any) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const steps = props.steps;
-console.table(props);
+
   function handleNext() {
     setActiveStep((prevActiveStep: any) => prevActiveStep + 1);
     props.refreshData();
@@ -45,7 +45,7 @@ console.table(props);
     setActiveStep(0);
     props.refreshData();
   }
-console.table(steps);
+
   return (
     <div className={classes.root}>
       <Stepper activeStep={activeStep} orientation="vertical">
@@ -53,7 +53,7 @@ console.table(steps);
           <Step key={name}>
             <StepLabel>{name}</StepLabel>
             <StepContent>
-              <Typography>{desc}</Typography>
+              <Typography dangerouslySetInnerHTML={{ __html: desc }} />
               <div className={classes.actionsContainer}>
                 <div>
                   <Button

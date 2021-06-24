@@ -46,9 +46,6 @@ export class StepperControl implements ComponentFramework.StandardControl<IInput
     this._notifyOutputChanged = notifyOutputChanged;
     this._refreshData = this.refreshData.bind(this);
 
-console.log('context', context);
-console.log('state', state);
-
     this._container = document.createElement('div');
     container.appendChild(this._container);
 
@@ -56,6 +53,7 @@ console.log('state', state);
     this._props.steps = [];
     await this.getSteps();
     if (!this._props.steps.length) {
+      alert('Contact Your Administrator with Error: "FetchXML did not return Protocol Steps"');
       return;
     }
 
@@ -89,7 +87,6 @@ console.log('state', state);
   }
 
   refreshData() {
-console.log('refreshData')
     this._notifyOutputChanged();
   }
 
@@ -121,17 +118,17 @@ console.log('refreshData')
 
     const {
       entityProperty: { raw: entityPropertyName },
-      attributeStage: { raw: stagePropertyName },
       attributeStepName: { raw: stepNamePropertyName },
-      attributeStepDesc: { raw: stepDescPropertyName }
+      attributeStepDesc: { raw: stepDescPropertyName },
+      attributeStepOrder: { raw: stepOrderPropertyName }
     } = this._context.parameters;
 
     let fetchXML: string = "";
     fetchXML += "<fetch mapping='logical'>";
     fetchXML += `<entity name='${entityPropertyName}'>`;
-    fetchXML += `<attribute name='${stagePropertyName}' />`;
     fetchXML += `<attribute name='${stepNamePropertyName}' />`;
     fetchXML += `<attribute name='${stepDescPropertyName}' />`;
+    fetchXML += `<attribute name='${stepOrderPropertyName}' />`;
     fetchXML += "</entity>";
     fetchXML += "</fetch>";
 
@@ -142,13 +139,11 @@ console.log('refreshData')
         `?fetchXml= ${encodeURIComponent(fetchXML)}`
       );
 
-console.log('response', response);
-      this._props.steps = response.entities.map(
-        ({ [stepNamePropertyName]: name, [stepDescPropertyName]: desc }) => ({ name, desc })
-      );
-    } catch(errorResponse) {
-console.log('errorResponse', errorResponse);
-      // thisRef.updateResultContainerTextWithErrorResponse(errorResponse);
-    }
+      this._props.steps = response.entities
+        .sort((a, b) => a[stepOrderPropertyName] - b[stepOrderPropertyName])
+        .map(
+          ({ [stepNamePropertyName]: name, [stepDescPropertyName]: desc }) => ({ name, desc })
+        );
+    } catch(errorResponse) {}
   }
 }
