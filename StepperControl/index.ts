@@ -46,8 +46,6 @@ export class StepperControl implements ComponentFramework.StandardControl<IInput
     this._notifyOutputChanged = notifyOutputChanged;
     this._refreshData = this.refreshData.bind(this);
 
-console.log('context', context);
-
     this._container = document.createElement('div');
     container.appendChild(this._container);
 
@@ -89,7 +87,6 @@ console.log('context', context);
   }
 
   refreshData() {
-console.log('refreshData')
     this._notifyOutputChanged();
   }
 
@@ -142,14 +139,11 @@ console.log('refreshData')
         `?fetchXml= ${encodeURIComponent(fetchXML)}`
       );
 
-console.log('response', response);
       this._props.steps = response.entities
         .sort((a, b) => a[stepOrderPropertyName] - b[stepOrderPropertyName])
         .map(
           ({ [stepNamePropertyName]: name, [stepDescPropertyName]: desc }) => ({ name, desc })
         );
-    } catch(errorResponse) {
-console.error(errorResponse);
-    }
+    } catch(errorResponse) {}
   }
 }
