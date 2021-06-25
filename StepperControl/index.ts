@@ -8,9 +8,13 @@ import Nonlinear from './nonlinear';
 import vertical from './vertical';
 
 
+type Steps = {
+  name: string;
+  desc: string;
+};
 class GetSteps {
-  flowType:    any;
-  steps:       any[];
+  flowType:    string;
+  steps:       Array<Steps>;
   refreshData: (value: any) => void;
 }
 
@@ -51,19 +55,22 @@ export class StepperControl implements ComponentFramework.StandardControl<IInput
 
     this._props = new GetSteps();
     this._props.steps = [];
-    await this.getSteps();
+
+    let errorMessage = 'Contact Your Administrator with Error: "FetchXML did not return Protocol Steps"';
+    try {
+      this._props.steps = await this.getSteps();
+    } catch(error) {
+      alert(`${errorMessage}\nReason: "${error}"`);
+      return;
+    }
     if (!this._props.steps.length) {
-      alert('Contact Your Administrator with Error: "FetchXML did not return Protocol Steps"');
+      alert(`${errorMessage}\nReason: "Empty array"`);
       return;
     }
 
     //Linear Basic Bar , Linear Basic Dotted , Linear Basic Customized
     // Vertical , NonLinear
-    this._props.flowType = (
-      context.parameters.flowTypeProperty && context.parameters.flowTypeProperty.raw ?
-        context.parameters.flowTypeProperty.raw
-      : 'Linear Basic Bar'
-    );
+    this._props.flowType = context.parameters.flowTypeProperty?.raw ?? 'Linear Basic Bar';
 
     this._props.refreshData = this._refreshData;
 
@@ -114,36 +121,56 @@ export class StepperControl implements ComponentFramework.StandardControl<IInput
     // Add code to cleanup control if necessary
   }
 
-  private async getSteps(): Promise<void> {
+  private async getSteps(): Promise<Array<Steps>> {
 
     const {
-      entityProperty: { raw: entityPropertyName },
-      attributeStepName: { raw: stepNamePropertyName },
-      attributeStepDesc: { raw: stepDescPropertyName },
-      attributeStepOrder: { raw: stepOrderPropertyName }
+      entityProperty,
+      attributeStepName,
+      attributeStepDesc,
+      attributeStepOrder
     } = this._context.parameters;
+
+    try {
+      this.validateProperty(entityProperty, 'Entity Property');
+      this.validateProperty(attributeStepName, 'Step Name');
+      this.validateProperty(attributeStepDesc, 'Step Description');
+      this.validateProperty(attributeStepOrder, 'Step Order');
+    } catch(error) {
+      throw error;
+    }
 
     let fetchXML: string = "";
     fetchXML += "<fetch mapping='logical'>";
-    fetchXML += `<entity name='${entityPropertyName}'>`;
-    fetchXML += `<attribute name='${stepNamePropertyName}' />`;
-    fetchXML += `<attribute name='${stepDescPropertyName}' />`;
-    fetchXML += `<attribute name='${stepOrderPropertyName}' />`;
+    fetchXML += `<entity name='${entityProperty.raw}'>`;
+    fetchXML += `<attribute name='${attributeStepName.raw}' />`;
+    fetchXML += `<attribute name='${attributeStepDesc.raw}' />`;
+    fetchXML += `<attribute name='${attributeStepOrder.raw}' />`;
     fetchXML += "</entity>";
     fetchXML += "</fetch>";
 
     let response: ComponentFramework.WebApi.RetrieveMultipleResponse;
     try {
       response = await this._context.webAPI.retrieveMultipleRecords(
-        entityPropertyName,
+        entityProperty.raw,
         `?fetchXml= ${encodeURIComponent(fetchXML)}`
       );
 
-      this._props.steps = response.entities
-        .sort((a, b) => a[stepOrderPropertyName] - b[stepOrderPropertyName])
+      return response.entities
+        .sort((a, b) => a[attributeStepOrder.raw] - b[attributeStepOrder.raw])
         .map(
-          ({ [stepNamePropertyName]: name, [stepDescPropertyName]: desc }) => ({ name, desc })
+          ({ [attributeStepName.raw]: name, [attributeStepDesc.raw]: desc }) => ({ name, desc })
         );
-    } catch(errorResponse) {}
+    } catch(error) {
+      throw error.title;
+    }
+  }
+
+  private validateProperty(property: any, name: string): void {
+    if (!property || !(property instanceof Object)) {
+      throw `Unknown ${name}`;
+    }
+    if (typeof property.raw !== 'string' || property.raw === '') {
+      throw `Incorrect ${name} Value`;
+    }
   }
 }

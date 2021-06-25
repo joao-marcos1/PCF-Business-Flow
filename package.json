@@ -12,9 +12,11 @@
     "@material-ui/core": "^4.3.3",
     "@material-ui/icons": "^4.2.1",
     "@types/node": "^10.12.18",
-    "@types/powerapps-component-framework": "1.1.0"
+    "@types/powerapps-component-framework": "1.1.0",
+    "dompurify": "^2.2.9"
   },
   "devDependencies": {
+    "@types/dompurify": "^2.2.2",
     "pcf-scripts": "^0.4.3",
     "pcf-start": "^0.4.3"
   }

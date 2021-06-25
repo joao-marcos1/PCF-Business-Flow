@@ -1,4 +1,6 @@
 import * as React from 'react';
+import * as DOMPurify from 'dompurify';
+
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
@@ -53,7 +55,7 @@ export default function VerticalLinearStepper(props: any) {
           <Step key={name}>
             <StepLabel>{name}</StepLabel>
             <StepContent>
-              <Typography dangerouslySetInnerHTML={{ __html: desc }} />
+              <Typography dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(desc) }} />
               <div className={classes.actionsContainer}>
                 <div>
                   <Button
