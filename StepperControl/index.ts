@@ -3,9 +3,7 @@ import { IInputs, IOutputs } from "./generated/ManifestTypes";
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import Stepper from './stepper';
-import Nonlinear from './nonlinear';
-import vertical from './vertical';
+import VerticalLinearStepper from './VerticalLinearStepper';
 
 
 type Steps = {
@@ -13,7 +11,6 @@ type Steps = {
   desc: string;
 };
 class GetSteps {
-  flowType:    string;
   steps:       Array<Steps>;
   refreshData: (value: any) => void;
 }
@@ -68,26 +65,13 @@ export class StepperControl implements ComponentFramework.StandardControl<IInput
       return;
     }
 
-    //Linear Basic Bar , Linear Basic Dotted , Linear Basic Customized
-    // Vertical , NonLinear
-    this._props.flowType = context.parameters.flowTypeProperty?.raw ?? 'Linear Basic Bar';
-
     this._props.refreshData = this._refreshData;
 
     ReactDOM.render(
       React.createElement(
         React.Fragment,
         null,
-        React.createElement(
-          (
-            this._props.flowType === 'Vertical' ?
-              vertical
-            : this._props.flowType === 'NonLinear' ?
-              Nonlinear
-            : Stepper
-          ),
-          this._props
-        )
+        React.createElement(VerticalLinearStepper, this._props)
       ),
       this._container
     );
