@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest>
-  <control namespace="PCFNamespace2" constructor="StepperControl" version="0.0.8" display-name-key="Test3" description-key="Updated Stepper Control WCS Edition" control-type="standard">
+  <control namespace="PCFNamespace2" constructor="StepperControl" version="1.0.0" display-name-key="Stepper Control with FetchXML" description-key="Updated Stepper Control WCS Edition" control-type="standard">
     <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
     <property name="entityProperty" display-name-key="entity_Display_Key" description-key="entity_Desc_Key" of-type="SingleLine.Text" usage="input" required="true" />
     <property name="attributeStepName" display-name-key="StepName" description-key="Step Name" of-type="SingleLine.Text" usage="input" required="true" />
