@@ -3,28 +3,29 @@ GlobalFormContext;
 function onLoad(executionContext) {
     GlobalFormContext = executionContext.getFormContext();
 
-    const GetRecord = GlobalFormContext.data.entity.getId();
-    WtVerify(GetRecord);
+    verifyWeight();
 }
 
-function RunOnSelected(executionContext) {  ///May need to change to onSAVE or Post Save
+function onSave(executionContext) {
     try {
-        const { attributes } = executionContext.getFormContext().data.entity;
-        const QCVerify = attributes.getByName("wcs_qcreceivedweightverification").getValue();
-        const QCAllowance = attributes.getByName("wcs_qcreceivedweightallowance").getValue();
+        const formContext = executionContext.getFormContext();
+        const receivedWeight = formContext.getAttribute("wcs_receivedweightg").getValue();
+        // It will be available, just hardcode it for now
+        const reportedWeight = 10;
+        // const reportedWeight = formContext.getAttribute("wcs_reportedweightg").getValue();
+        const verifiedWeight = reportedWeight - receivedWeight;
+        const QCAllowance = formContext.getAttribute("wcs_qcreceivedweightallowance").getValue();
+        formContext.getAttribute("wcs_qcreceivedweightverification").setValue(verifiedWeight);
+        formContext.getAttribute("wcs_qcweightverified").setValue(verifiedWeight <= QCAllowance);
 
-        attributes.getByName("wcs_qcweightverified").setValue(QCVerify <= QCAllowance);
-        alert(QCVerify <= QCAllowance);
-
-        const gv = GlobalFormContext.data.entity.getId();
-        WtVerify(gv);
+        verifyWeight();
     } catch (e) {
-        Xrm.Utility.alertDialog(e.message);
+        Xrm.Utility.alertDialog(e.message, { height: 120 });
     }
 }
 
-function WtVerify(wcs_ordernumber) { //Is this being called in the previous function ok? Is that function complete (and the value updated) before this is called??
-console.log('WtVerify', wcs_ordernumber);
+function verifyWeight() {
+    const wcs_ordernumber = GlobalFormContext.data.entity.getId();
     let fetchXml = [
         "<fetch>",
           "<entity name='wcs_sampletracker'>",
@@ -54,12 +55,14 @@ console.log('WtVerify', wcs_ordernumber);
         }
     )
     .then(response => response.json())
-    .then(({ value }) => {
+    .then(data => {
+        if (data.error) {
+            throw Error(data.error.message);
+        }
         // need to create column in sample tracker ??
-        GlobalFormContext.getAttribute("wcs_sampleweightsverified").setValue(!value.length); 
-console.log(value.length);
+        GlobalFormContext.getAttribute("wcs_sampleweightsverified").setValue(!data.value.length);
     })
-    .catch(error => Xrm.Utility.alertDialog("Error: " + error.message));
+    .catch(error => Xrm.Utility.alertDialog("Error: " + error.message, { height: 120 }));
 }
 
 ///Decide On Select/Save/PostSave/Load and Clean Up any ASync Issues
