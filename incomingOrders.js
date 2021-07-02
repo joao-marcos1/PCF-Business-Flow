@@ -10,13 +10,12 @@ function onSave(executionContext) {
     try {
         const formContext = executionContext.getFormContext();
         const receivedWeight = formContext.getAttribute("wcs_receivedweightg").getValue();
-        // It will be available, just hardcode it for now
-        const reportedWeight = 10;
-        // const reportedWeight = formContext.getAttribute("wcs_reportedweightg").getValue();
-        const verifiedWeight = reportedWeight - receivedWeight;
+        const reportedWeight = formContext.getAttribute("wcs_reportedweightg").getValue();
         const QCAllowance = formContext.getAttribute("wcs_qcreceivedweightallowance").getValue();
-        formContext.getAttribute("wcs_qcreceivedweightverification").setValue(verifiedWeight);
-        formContext.getAttribute("wcs_qcweightverified").setValue(verifiedWeight <= QCAllowance);
+
+        const isWeightVerified = Math.abs(reportedWeight - receivedWeight) <= Math.abs(QCAllowance);
+
+        formContext.getAttribute("wcs_qcweightverified").setValue(isWeightVerified);
 
         verifyWeight();
     } catch (e) {
@@ -38,8 +37,6 @@ function verifyWeight() {
           "</entity>",
         "</fetch>",
     ].join("");
-
-//debug
 
     const fetchUrl = Xrm.Page.context.getClientUrl()
         + "/api/data/v9.0/wcs_sampletrackers?fetchXml="
