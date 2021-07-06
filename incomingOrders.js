@@ -1,5 +1,5 @@
 let GlobalFormContext;
-let isSaving = false;
+let saving = {};
 
 function onLoad(executionContext) {
     GlobalFormContext = executionContext.getFormContext();
@@ -8,27 +8,32 @@ function onLoad(executionContext) {
 }
 
 async function onSave(executionContext) {
-    if (isSaving) {
+    const formContext = executionContext.getFormContext();
+    const trackerId = formContext.data.entity.getId();
+
+    if (saving[trackerId]?.isSaving) {
+        if (saving[trackerId].value !== formContext.getAttribute("wcs_receivedweightg").getValue()) {
+            formContext.getAttribute("wcs_receivedweightg").setValue(saving[trackerId].value);
+        }
         return;
     }
 
-    isSaving = true;
-
-    const formContext = executionContext.getFormContext();
+    saving[trackerId] = ({ isSaving: true });
 
     try {
-        await updateWeightVerified(formContext);
+        await updateWeightVerified(formContext, trackerId);
         await formContext.data.save();
         verifyWeight();
     } catch (e) {
         Xrm.Utility.alertDialog(e.message, { height: 150 });
     }
-    isSaving = false;
+    delete saving[trackerId];
 }
 
-async function updateWeightVerified(formContext) {
+async function updateWeightVerified(formContext, trackerId) {
     const receivedWeight = formContext.getAttribute("wcs_receivedweightg").getValue();
-    const trackerId = formContext.data.entity.getId();
+    saving[trackerId]['value'] = receivedWeight;
+
     const { reportedWeight, weightAllowance } = await getReportedWeight(trackerId);
     const isWeightVerified = Math.abs(reportedWeight - receivedWeight) <= Math.abs(weightAllowance);
 
