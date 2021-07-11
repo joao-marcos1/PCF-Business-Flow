@@ -35,9 +35,8 @@ async function saveToLog(executionContext) {
             throw Error(data.error.message);
         }
 
-console.log(data.value.length);
         if (data.value.length) {
-            showObj(ArrayLength, userName, trackerNumber, BPFStage);
+            showObj(userName, trackerNumber, BPFStage);
         }
     } catch(e) {
         Xrm.Navigation.openAlertDialog("Error: " + e.message);
