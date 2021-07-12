@@ -45,7 +45,7 @@ async function saveToLog(executionContext) {
 
 function showObj(userName, trackerNumber, BPFStage) {
     window.open(
-        'https://apps.powerapps.com/play/03b28197-7202-4c88-8046-b1ecb01b5fad?source=JS&user='
+        'https://apps.powerapps.com/play/6157001e-2a22-4471-8b73-422f47786b9c?source=JS&user='
         + userName + '&record=' + trackerNumber + '&stage=' + BPFStage, '&FormType="Sample"' + "",
         "width=800,height=600",
         "menubar=no",
