@@ -19,23 +19,23 @@ async function onChange(executionContext) {
 }
 
 async function updateWeightVerified(gridContext) {
-    const receivedWeight = gridContext.getAttribute("wcs_receivedweightg").getValue();
-    const trackerId = gridContext.data.entity.getId();
+    const recordedWeight = gridContext.getAttribute("wcs_recordedweightg").getValue();
+    const samlpeId = gridContext.data.entity.getId();
 
-    const { reportedWeight, weightAllowance } = await getReportedWeight(trackerId);
-    const isWeightVerified = Math.abs(reportedWeight - receivedWeight) <= Math.abs(weightAllowance);
+    const { reportedWeight, weightAllowance } = await getRecordedWeight(samlpeId);
+    const isWeightVerified = Math.abs(reportedWeight - recordedWeight) <= Math.abs(weightAllowance);
 
-    gridContext.getAttribute("wcs_qcweightverified").setValue(isWeightVerified);
+    gridContext.getAttribute("wcs_weightverified").setValue(isWeightVerified);
 }
 
-async function getReportedWeight(wcs_sampletrackerid) {
+async function getRecordedWeight(wcs_sampleid) {
     const fetchXml = [
         "<fetch>",
-            "<entity name='wcs_sampletracker'>",
+            "<entity name='wcs_laboratorysamples'>",
                 "<attribute name='wcs_reportedweightg' />",
-                "<attribute name='wcs_qcreceivedweightallowance' />",
+                "<attribute name='wcs_allowedweightvariancepct' />",
                 "<filter>",
-                    "<condition attribute='wcs_sampletrackerid' operator='eq' value='", wcs_sampletrackerid, "' />",
+                    "<condition attribute='wcs_sampleid' operator='eq' value='", wcs_sampleid, "' />",
                 "</filter>",
             "</entity>",
         "</fetch>"
@@ -51,15 +51,13 @@ async function getReportedWeight(wcs_sampletrackerid) {
 
 async function verifyWeight() {
     try {
-        const trackingStatus = 799530000;    // Awaiting Arrival tracking status
         const wcs_ordernumber = GlobalFormContext.data.entity.getId();
         const fetchXml = [
             "<fetch>",
-                "<entity name='wcs_sampletracker'>",
+                "<entity name='wcs_laboratorysamples'>",
                     "<filter>",
                         "<condition attribute='wcs_ordernumber' operator='eq' value='", wcs_ordernumber, "' />",
-                        "<condition attribute='wcs_sampletrackingstatus' operator='eq' value='", trackingStatus, "' />",
-                        "<condition attribute='wcs_qcweightverified' operator='eq' value='0' />",
+                        "<condition attribute='wcs_weightverified' operator='eq' value='0' />",
                     "</filter>",
                 "</entity>",
             "</fetch>"
@@ -76,7 +74,7 @@ async function verifyWeight() {
 
 async function fetchData(fetchXml) {
     const fetchUrl = Xrm.Page.context.getClientUrl()
-        + "/api/data/v9.2/wcs_sampletrackers?fetchXml="
+        + "/api/data/v9.2/wcs_laboratorysamples?fetchXml="
         + encodeURIComponent(fetchXml);
 
     try {
