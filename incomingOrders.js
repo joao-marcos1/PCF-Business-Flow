@@ -20,15 +20,15 @@ async function onChange(executionContext) {
 
 async function updateWeightVerified(gridContext) {
     const recordedWeight = gridContext.getAttribute("wcs_recordedweightg").getValue();
-    const samlpeId = gridContext.data.entity.getId();
+    const samlpeId = gridContext.getAttribute("wcs_sampleid").getValue();
 
-    const { reportedWeight, weightAllowance } = await getRecordedWeight(samlpeId);
+    const { reportedWeight, weightAllowance } = await getReportedWeight(samlpeId);
     const isWeightVerified = Math.abs(reportedWeight - recordedWeight) <= Math.abs(weightAllowance);
 
     gridContext.getAttribute("wcs_weightverified").setValue(isWeightVerified);
 }
 
-async function getRecordedWeight(wcs_sampleid) {
+async function getReportedWeight(wcs_sampleid) {
     const fetchXml = [
         "<fetch>",
             "<entity name='wcs_laboratorysamples'>",
@@ -44,8 +44,8 @@ async function getRecordedWeight(wcs_sampleid) {
     const data = await fetchData(fetchXml);
 
     return {
-        reportedWeight: data?.value[0].wcs_reportedweightg,
-        weightAllowance: data?.value[0].wcs_qcreceivedweightallowance
+        reportedWeight:  data?.value[0].wcs_reportedweightg,
+        weightAllowance: data?.value[0].wcs_allowedweightvariancepct
     };
 }
 
@@ -74,7 +74,7 @@ async function verifyWeight() {
 
 async function fetchData(fetchXml) {
     const fetchUrl = Xrm.Page.context.getClientUrl()
-        + "/api/data/v9.2/wcs_laboratorysamples?fetchXml="
+        + "/api/data/v9.2/wcs_laboratorysampleses?fetchXml="
         + encodeURIComponent(fetchXml);
 
     try {
