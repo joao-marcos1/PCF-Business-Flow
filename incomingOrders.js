@@ -1,7 +1,42 @@
 let GlobalFormContext;
 
 function onLoad(executionContext) {
-    GlobalFormContext = executionContext.getFormContext();
+    try {
+        GlobalFormContext = executionContext.getFormContext();
+        GlobalFormContext.getControl("Subgrid_1").addOnLoad(async execContext => {
+            const gridRows = execContext.getFormContext().getControl("Subgrid_1").getGrid().getRows();
+            const sampleTrackerNumbers = [];
+
+            gridRows.forEach(row => {
+                const sampleTrackerNumberAttr = row.getAttribute("wcs_sampletrackernumber");
+
+                if (sampleTrackerNumberAttr !== null && sampleTrackerNumberAttr.getValue() === null) {
+                    sampleTrackerNumbers.push(row.getAttribute("wcs_sampleid").getValue() + '-0');
+                }
+            });
+
+            if (sampleTrackerNumbers.length) {
+                const sampleIds = await getSampleTrackerRecordsDetails(sampleTrackerNumbers);
+
+                if (Object.keys(sampleIds).length) {
+                    gridRows.forEach(row => {
+                        const sampleIdAttr = row.getAttribute("wcs_sampleid");
+                        const sampleIdObj = sampleIds[sampleIdAttr.getValue()];
+
+                        if (typeof sampleIdObj !== 'undefined') {
+                            row.getAttribute("wcs_sampletrackernumber").setValue([{
+                                id: sampleIdObj.id,
+                                name: sampleIdObj.name,
+                                entityType: 'wcs_sampletracker'
+                            }]);
+                        }
+                    });
+                }
+            }
+        });
+    } catch(e) {
+        Xrm.Navigation.openAlertDialog("Error: " + e.message);
+    }
 }
 
 async function onChange(executionContext) {
@@ -25,6 +60,36 @@ async function updateWeightVerified(gridContext) {
     const isWeightVerified = Math.abs(reportedWeight - recordedWeight) <= Math.abs(weightVariance);
 
     gridContext.getAttribute("wcs_weightverified").setValue(isWeightVerified);
+}
+
+async function getSampleTrackerRecordsDetails(sampleTrackerNumbers) {
+    const fetchXml = [
+        "<fetch>",
+            "<entity name='wcs_sampletracker'>",
+                "<attribute name='wcs_samplerecordnumber' />",
+                "<attribute name='wcs_sampleid' />",
+                "<filter>",
+                    "<condition attribute='wcs_sampletrackernumber' operator='in'>",
+                        ...sampleTrackerNumbers.map(number => `<value>${number}</value>`),
+                    "</condition>",
+                "</filter>",
+            "</entity>",
+        "</fetch>"
+    ].join("");
+
+    const data = await fetchData(fetchXml, 'wcs_sampletrackers');
+
+    let result = {};
+    if (data.value.length) {
+        data.value.forEach(value => {
+            result[value['_wcs_sampleid_value@OData.Community.Display.V1.FormattedValue']] = {
+                id: value['_wcs_sampleid_value'],
+                name: value['wcs_samplerecordnumber']
+            }
+        });
+    }
+
+    return result;
 }
 
 async function getRecordDetails(wcs_sampleid) {
@@ -71,9 +136,9 @@ async function verifyWeight() {
     }
 }
 
-async function fetchData(fetchXml) {
+async function fetchData(fetchXml, tableName = 'wcs_laboratorysampleses') {
     const fetchUrl = Xrm.Page.context.getClientUrl()
-        + "/api/data/v9.2/wcs_laboratorysampleses?fetchXml="
+        + `/api/data/v9.2/${tableName}?fetchXml=`
         + encodeURIComponent(fetchXml);
 
     try {
