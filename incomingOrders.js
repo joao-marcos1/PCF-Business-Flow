@@ -2,14 +2,12 @@ let GlobalFormContext;
 
 function onLoad(executionContext) {
     GlobalFormContext = executionContext.getFormContext();
-
-    verifyWeight();
 }
 
 async function onChange(executionContext) {
-    const gridContext = executionContext.getFormContext();
-
     try {
+        const gridContext = executionContext.getFormContext();
+
         await updateWeightVerified(gridContext);
         await gridContext.data.save();
         verifyWeight();
