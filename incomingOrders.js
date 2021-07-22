@@ -3,40 +3,47 @@ let GlobalFormContext;
 function onLoad(executionContext) {
     try {
         GlobalFormContext = executionContext.getFormContext();
-        GlobalFormContext.getControl("Subgrid_1").addOnLoad(async execContext => {
-            const gridRows = execContext.getFormContext().getControl("Subgrid_1").getGrid().getRows();
-            const sampleTrackerNumbers = [];
-
-            gridRows.forEach(row => {
-                const sampleTrackerNumberAttr = row.getAttribute("wcs_sampletrackernumber");
-
-                if (sampleTrackerNumberAttr !== null && sampleTrackerNumberAttr.getValue() === null) {
-                    sampleTrackerNumbers.push(row.getAttribute("wcs_sampleid").getValue() + '-0');
-                }
-            });
-
-            if (sampleTrackerNumbers.length) {
-                const sampleIds = await getSampleTrackerRecordsDetails(sampleTrackerNumbers);
-
-                if (Object.keys(sampleIds).length) {
-                    gridRows.forEach(row => {
-                        const sampleIdAttr = row.getAttribute("wcs_sampleid");
-                        const sampleIdObj = sampleIds[sampleIdAttr.getValue()];
-
-                        if (typeof sampleIdObj !== 'undefined') {
-                            row.getAttribute("wcs_sampletrackernumber").setValue([{
-                                id: sampleIdObj.id,
-                                name: sampleIdObj.name,
-                                entityType: 'wcs_sampletracker'
-                            }]);
-                        }
-                    });
-                }
-            }
-        });
+        GlobalFormContext.getControl("Subgrid_1").addOnLoad(subGridOnLoad);
     } catch(e) {
         Xrm.Navigation.openAlertDialog("Error: " + e.message);
     }
+}
+
+async function subGridOnLoad(executionContext) {
+    const formContext = executionContext.getFormContext();
+    const subGridControl = formContext.getControl("Subgrid_1");
+    const gridRows = subGridControl.getGrid().getRows();
+    const sampleTrackerNumbers = [];
+
+    gridRows.forEach(row => {
+        const sampleTrackerNumberAttr = row.getAttribute("wcs_sampletrackernumber");
+
+        if (sampleTrackerNumberAttr !== null && sampleTrackerNumberAttr.getValue() === null) {
+            sampleTrackerNumbers.push(row.getAttribute("wcs_sampleid").getValue() + '-0');
+        }
+    });
+
+    if (sampleTrackerNumbers.length) {
+        const sampleIds = await getSampleTrackerRecordsDetails(sampleTrackerNumbers);
+
+        if (Object.keys(sampleIds).length) {
+            gridRows.forEach(row => {
+                const sampleIdAttr = row.getAttribute("wcs_sampleid");
+                const sampleIdObj = sampleIds[sampleIdAttr.getValue()];
+
+                if (typeof sampleIdObj !== 'undefined') {
+                    row.getAttribute("wcs_sampletrackernumber").setValue([{
+                        id: sampleIdObj.id,
+                        name: sampleIdObj.name,
+                        entityType: 'wcs_sampletracker'
+                    }]);
+                }
+            });
+            await formContext.data.save();
+        }
+    }
+
+    subGridControl.removeOnLoad(subGridOnLoad);
 }
 
 async function onChange(executionContext) {
@@ -66,7 +73,7 @@ async function getSampleTrackerRecordsDetails(sampleTrackerNumbers) {
     const fetchXml = [
         "<fetch>",
             "<entity name='wcs_sampletracker'>",
-                "<attribute name='wcs_samplerecordnumber' />",
+                "<attribute name='wcs_sampletrackernumber' />",
                 "<attribute name='wcs_sampleid' />",
                 "<filter>",
                     "<condition attribute='wcs_sampletrackernumber' operator='in'>",
@@ -80,14 +87,12 @@ async function getSampleTrackerRecordsDetails(sampleTrackerNumbers) {
     const data = await fetchData(fetchXml, 'wcs_sampletrackers');
 
     let result = {};
-    if (data.value.length) {
-        data.value.forEach(value => {
-            result[value['_wcs_sampleid_value@OData.Community.Display.V1.FormattedValue']] = {
-                id: value['_wcs_sampleid_value'],
-                name: value['wcs_samplerecordnumber']
-            }
-        });
-    }
+    data.value.forEach(value => {
+        result[value['_wcs_sampleid_value@OData.Community.Display.V1.FormattedValue']] = {
+            id: value['wcs_sampletrackerid'],
+            name: value['wcs_sampletrackernumber']
+        }
+    });
 
     return result;
 }
