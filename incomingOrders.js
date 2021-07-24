@@ -1,18 +1,28 @@
 let GlobalFormContext;
+let GlobalSubGridControl;
 
 function onLoad(executionContext) {
     try {
-        GlobalFormContext = executionContext.getFormContext();
-        GlobalFormContext.getControl("Subgrid_1").addOnLoad(subGridOnLoad);
+        if (
+            typeof GlobalFormContext === 'undefined' &&
+            typeof GlobalSubGridControl === 'undefined'
+        ) {
+            GlobalFormContext = executionContext.getFormContext();
+            GlobalSubGridControl = GlobalFormContext.getControl("Subgrid_1");
+
+            GlobalSubGridControl.removeOnLoad(subGridOnLoad);
+            GlobalSubGridControl.addOnLoad(subGridOnLoad);
+        }
     } catch(e) {
         Xrm.Navigation.openAlertDialog("Error: " + e.message);
     }
 }
 
 async function subGridOnLoad(executionContext) {
+    GlobalSubGridControl.removeOnLoad(subGridOnLoad);
+
     const formContext = executionContext.getFormContext();
-    const subGridControl = formContext.getControl("Subgrid_1");
-    const gridRows = subGridControl.getGrid().getRows();
+    const gridRows = GlobalSubGridControl.getGrid().getRows();
     const sampleTrackerNumbers = [];
 
     gridRows.forEach(row => {
@@ -39,20 +49,26 @@ async function subGridOnLoad(executionContext) {
                     }]);
                 }
             });
+
             await formContext.data.save();
         }
     }
 
-    subGridControl.removeOnLoad(subGridOnLoad);
+    await verifyWeight();
+
+    GlobalSubGridControl.addOnLoad(subGridOnLoad);
 }
 
 async function onChange(executionContext) {
     try {
+        GlobalSubGridControl.removeOnLoad(subGridOnLoad);
+
         const gridContext = executionContext.getFormContext();
 
         await updateWeightVerified(gridContext);
         await gridContext.data.save();
-        verifyWeight();
+
+        GlobalSubGridControl.addOnLoad(subGridOnLoad);
     } catch (e) {
         Xrm.Navigation.openAlertDialog("Error: " + e.message);
     }
@@ -124,16 +140,19 @@ async function verifyWeight() {
         const fetchXml = [
             "<fetch>",
                 "<entity name='wcs_laboratorysamples'>",
+                    "<attribute name='wcs_weightverified' />",
                     "<filter>",
                         "<condition attribute='wcs_ordernumber' operator='eq' value='", wcs_ordernumber, "' />",
-                        "<condition attribute='wcs_weightverified' operator='eq' value='0' />",
                     "</filter>",
                 "</entity>",
             "</fetch>"
         ].join("");
 
         const data = await fetchData(fetchXml);
-        const isSampleWeightsVerified = !!data && !data.value.length;
+        const isSampleWeightsVerified = (
+            !!data?.value.length &&
+            data?.value.every(value => value.wcs_weightverified)
+        );
 
         GlobalFormContext.getAttribute("wcs_sampleweightsverified").setValue(isSampleWeightsVerified);
     } catch(e) {
