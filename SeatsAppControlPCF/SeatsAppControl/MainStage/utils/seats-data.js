@@ -1,4 +1,4 @@
-{
+export default {
   "seats": {
     "sections": [
       {
@@ -133,4 +133,4 @@
       }
     ]
   }
-}
+};

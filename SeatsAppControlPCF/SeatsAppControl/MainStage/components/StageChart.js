@@ -1,39 +1,20 @@
-import React from "react";
-import { Stage, Layer } from "./react-konva";
-import Section from "./Section";
-import SeatPopup from "./SeatPopup";
-import * as layout from "./layout";
-import filterData from "./filterData";
-import useFetch from "./useFetch";
+import React from 'react';
+import { Stage, Layer } from '../react-konva';
+import Section from './Section';
+import SeatPopup from './SeatPopup';
+import * as layout from '../utils/layout';
+import filterData from '../utils/filterData';
 
-const MainStage = props => {
-  const seatsData = useFetch("./seats-data.json");
-  const containerRef = React.useRef(null);
+const StageChart = ({ size, seats }) => {
   const stageRef = React.useRef(null);
 
   const [scale, setScale] = React.useState(1);
   const [scaleToFit, setScaleToFit] = React.useState(1);
-  const [size, setSize] = React.useState({
-    width: 1000,
-    height: 1000,
-    virtualWidth: 1000
-  });
   const [virtualWidth, setVirtualWidth] = React.useState(1000);
 
   const [selectedSeatsIds, setSelectedSeatsIds] = React.useState([]);
 
   const [popup, setPopup] = React.useState({ seat: null });
-
-  // calculate available space for drawing
-  React.useEffect(() => {
-    const newSize = {
-      width: containerRef.current.offsetWidth,
-      height: containerRef.current.offsetHeight
-    };
-    if (newSize.width !== size.width || newSize.height !== size.height) {
-      setSize(newSize);
-    }
-  });
 
   // calculate initial scale
   React.useEffect(() => {
@@ -48,9 +29,9 @@ const MainStage = props => {
     setScale(scaleToFit);
     setScaleToFit(scaleToFit);
     setVirtualWidth(clientRect.width);
-  }, [seatsData, size]);
+  }, [seats, size]);
 
-  // togle scale on double clicks or taps
+  // toggle scale on double clicks or taps
   const toggleScale = React.useCallback(() => {
     if (scale === 1) {
       setScale(scaleToFit);
@@ -68,17 +49,15 @@ const MainStage = props => {
     });
   }, []);
 
-  var selectedRows = useFetch("./seats-data.json");
-
   const handleSelect = React.useCallback(
     seatId => {
-      const newIds = selectedSeatsIds.concat(filterData(selectedRows?.seats?.sections))
+      // const newIds = selectedSeatsIds.concat(filterData(selectedRows?.seats?.sections))
 
         // select index numbers of array based on number of rows selected form selectedRows
         // update array
 
-      setSelectedSeatsIds(newIds);
-      console.log(newIds);
+      // setSelectedSeatsIds(newIds);
+      // console.log(newIds);
     },
     [selectedSeatsIds]
   );
@@ -92,24 +71,10 @@ const MainStage = props => {
     [selectedSeatsIds]
   );
 
-  if (seatsData === null || selectedRows === null) {
-    return <div ref={containerRef}>Loading...</div>;
-  }
-
-  const maxSectionWidth = layout.getMaximimSectionWidth(
-    seatsData.seats.sections
-  );
+  const maxSectionWidth = layout.getMaximimSectionWidth(seats.sections);
 
   return (
-    <div
-      style={{
-        position: "relative",
-        backgroundColor: "lightgrey",
-        width: "100vw",
-        height: "100vh"
-      }}
-      ref={containerRef}
-    >
+    <>
       <Stage
         ref={stageRef}
         width={size.width}
@@ -129,7 +94,7 @@ const MainStage = props => {
         scaleY={scale}
       >
         <Layer>
-          {seatsData.seats.sections.map((section, index) => {
+          {seats.sections.map((section, index) => {
             const height = layout.getSectionHeight(section);
             const position = lastSectionPosition + layout.SECTIONS_MARGIN;
             lastSectionPosition = position + height;
@@ -163,8 +128,8 @@ const MainStage = props => {
           }}
         />
       )}
-    </div>
+    </>
   );
 };
 
-export default MainStage;
+export default StageChart;

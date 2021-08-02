@@ -1,8 +1,8 @@
 export type DetailsListItem = {
   // key: number;
   sampleTrackerNumber: string;
-  platePositionNumber: string;
-  zoneLocation: string;
+  platePositionNumber: string | null;
+  zoneLocation: string | null;
   binLocation: string | null;
 };
 

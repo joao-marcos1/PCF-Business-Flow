@@ -9,7 +9,7 @@ import { MarqueeSelection } from '@fluentui/react/lib/MarqueeSelection';
 import { mergeStyles } from '@fluentui/react/lib/Styling';
 import { Text } from '@fluentui/react/lib/Text';
 
-// import MainStage from './Stage/MainStage';
+import MainStage from './MainStage';
 
 const exampleChildClass = mergeStyles({
   display: 'block',
@@ -21,7 +21,7 @@ const textFieldStyles: Partial<ITextFieldStyles> = { root: { maxWidth: '300px' }
 interface DetailsListState {
   items: DetailsListItem[];
   // selectionDetails: string;
-  // invockedItemId: number | null;
+  invockedItem: string;
 }
 
 class SeatsDetailsList extends React.Component<{}, DetailsListState> {
@@ -43,17 +43,16 @@ console.log('props.allItems :>> ', props.allItems);
     this.state = {
       items: this._allItems,
       // selectionDetails: this._getSelectionDetails(),
-      // invockedItemId: null,
+      invockedItem: '',
     };
   }
 
   public render(): JSX.Element {
-    const { items/*, selectionDetails, invockedItemId*/ } = this.state;
+    const { items/*, selectionDetails*/, invockedItem } = this.state;
 
     return (
-    // return <>
-    //   {invockedItemId === null ? (
-        <div>
+      <div style={{ display: "flex" }}>
+        <div style={{ width: "50%" }}>
           {/* <div className={exampleChildClass}>{selectionDetails}</div>
           <Text>
             Note: While focusing a row, pressing enter or double clicking will execute onItemInvoked, which in this
@@ -82,9 +81,9 @@ console.log('props.allItems :>> ', props.allItems);
             />
           </MarqueeSelection>
         </div>
-      )
-      // : <MainStage />}
-    // </>
+      {invockedItem !== '' &&  <MainStage />}
+      </div>
+    );
   }
 
   // private _getSelectionDetails(): string {
@@ -111,7 +110,7 @@ console.log('props.allItems :>> ', props.allItems);
 
   private _onItemInvoked = (item: DetailsListItem): void => {
     // console.log(`Item invoked: ${item.name}`);
-    // this.setState({ invockedItemId: item.key });
+    this.setState({ invockedItem: item.sampleTrackerNumber });
   };
 
   private _initColumns = (columns: Column[]) => {
