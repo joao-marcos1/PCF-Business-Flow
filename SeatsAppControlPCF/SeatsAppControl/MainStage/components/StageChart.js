@@ -11,6 +11,7 @@ const StageChart = ({ size, seats }) => {
   const [scale, setScale] = React.useState(1);
   const [scaleToFit, setScaleToFit] = React.useState(1);
   const [virtualWidth, setVirtualWidth] = React.useState(1000);
+  const [virtualOffset, setVirtualOffset] = React.useState(0);
 
   const [selectedSeatsIds, setSelectedSeatsIds] = React.useState([]);
 
@@ -29,6 +30,7 @@ const StageChart = ({ size, seats }) => {
     setScale(scaleToFit);
     setScaleToFit(scaleToFit);
     setVirtualWidth(clientRect.width);
+    setVirtualOffset(Math.abs(clientRect.x));
   }, [seats, size]);
 
   // toggle scale on double clicks or taps
@@ -92,6 +94,7 @@ const StageChart = ({ size, seats }) => {
         onDblClick={toggleScale}
         scaleX={scale}
         scaleY={scale}
+        x={virtualOffset}
       >
         <Layer>
           {seats.sections.map((section, index) => {
