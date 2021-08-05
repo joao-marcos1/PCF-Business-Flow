@@ -3,12 +3,13 @@ import { IInputs, IOutputs } from './generated/ManifestTypes';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import { DetailsListItem, Column } from './types';
+import { DetailsListItem, Column, MappedItem, MapSelectedItems } from './types';
 import SeatsDetailsList from './SeatsDetailsList';
 
 type Props = {
   allItems: DetailsListItem[];
-  columns: Column[]
+  columns: Column[];
+  mapSelectedItems: MapSelectedItems;
 };
 
 export class SeatsAppControl implements ComponentFramework.StandardControl<IInputs, IOutputs> {
@@ -38,11 +39,24 @@ export class SeatsAppControl implements ComponentFramework.StandardControl<IInpu
   ): Promise<void> {
     this._context   = context;
     this._container = container;
-    this._props     = { allItems: [], columns: [] };
+    this._props = {
+      allItems: [],
+      columns: [],
+      mapSelectedItems: this._mapSelectedItems
+    };
 console.log(`context`, context)
     const errorMessage = 'Contact Your Administrator with Error: "FetchXML did not return Details List"';
     try {
-      this._props.allItems = await this._getSeatsDetails();
+      // this._props.allItems = await this._getSeatsDetails();
+      this._props.allItems = [{
+        sampleTrackerNumber: 'Sample Tracker Number 1',
+        platePositionNumber: null,
+        binLocation: 'Bin Location 1'
+      }, {
+        sampleTrackerNumber: 'Sample Tracker Number 2',
+        platePositionNumber: null,
+        binLocation: 'Bin Location 2'
+      }];
       this._props.columns = this._getColumns();
     } catch(error) {
       alert(`${errorMessage}\nReason: "${error}"`);
@@ -120,17 +134,25 @@ console.log(`context`, context)
         `?fetchXml=${encodeURIComponent(fetchXML)}`
       );
 console.log(response)
-      return response.entities.map(entity => ({
-        // key: index,
+      const result: DetailsListItem[] = [];
+
+      response.entities.forEach(entity => {
         // @ts-ignore
-        sampleTrackerNumber: entity[sampleTrackerNumber.raw],
-        // @ts-ignore
-        platePositionNumber: entity[platePositionNumber.raw] || null,
-        // @ts-ignore
-        zoneLocation: entity[zoneLocation.raw] || null,
-        // @ts-ignore
-        binLocation: entity[binLocation.attributes.LogicalName] || null
-      }));
+        const binLocationValue: string | undefined = entity[binLocation.attributes.LogicalName];
+
+        if (binLocationValue) {
+          result.push({
+            // key: index,
+            // @ts-ignore
+            sampleTrackerNumber: entity[sampleTrackerNumber.raw],
+            // @ts-ignore
+            platePositionNumber: entity[platePositionNumber.raw] || null,
+            binLocation: binLocationValue
+          });
+        }
+      });
+
+      return result;
     } catch(error) {
 console.log(`error`, error)
       throw error.title;
@@ -153,8 +175,10 @@ console.log(`error`, error)
     return [
       { key: 'sampleTrackerNumber', name: 'Sample Tracker Number', fieldName: 'sampleTrackerNumber', },
       { key: 'platePositionNumber', name: 'Plate Position Number', fieldName: 'platePositionNumber', },
-      { key: 'zoneLocation', name: 'Zone Location', fieldName: 'zoneLocation', },
-      { key: 'binLocation', name: 'Bin Location', fieldName: 'binLocation', }
+      // { key: 'zoneLocation', name: 'Zone Location', fieldName: 'zoneLocation', },
+      // { key: 'binLocation', name: 'Bin Location', fieldName: 'binLocation', }
     ];
   }
+
+  private _mapSelectedItems = ({ binLocation }: { binLocation: string }): MappedItem => ({ binLocation });
 }

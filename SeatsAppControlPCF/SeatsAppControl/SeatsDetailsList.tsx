@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { DetailsListItem, Column } from './types';
+import { DetailsListItem, Column, MappedItem, MapSelectedItems } from './types';
 
 import { Announced } from '@fluentui/react/lib/Announced';
 import { TextField, ITextFieldStyles } from '@fluentui/react/lib/TextField';
@@ -20,52 +20,54 @@ const textFieldStyles: Partial<ITextFieldStyles> = { root: { maxWidth: '300px' }
 
 interface DetailsListState {
   items: DetailsListItem[];
-  // selectionDetails: string;
-  invockedItem: string;
+  selectedItems: MappedItem[];
+  // invockedItem: string;
 }
 
 class SeatsDetailsList extends React.Component<{}, DetailsListState> {
   private _selection: Selection;
   private _allItems: DetailsListItem[];
   private _columns: IColumn[];
+  private _mapSelectedItems: MapSelectedItems;
 
   constructor(props: any) {
     super(props);
 
     this._selection = new Selection({
-      // onSelectionChanged: () => this.setState({ selectionDetails: this._getSelectionDetails() }),
+      onSelectionChanged: () => this.setState({ selectedItems: this._getSelectedItems() }),
     });
 console.log('props.allItems :>> ', props.allItems);
     // Populate with items for demos.
     this._allItems = props.allItems;
     this._initColumns(props.columns);
+    this._mapSelectedItems = props.mapSelectedItems;
 
     this.state = {
       items: this._allItems,
-      // selectionDetails: this._getSelectionDetails(),
-      invockedItem: '',
+      selectedItems: this._getSelectedItems(),
+      // invockedItem: '',
     };
   }
 
   public render(): JSX.Element {
-    const { items/*, selectionDetails*/, invockedItem } = this.state;
+    const { items, selectedItems/*, invockedItem*/ } = this.state;
 
     return (
       <div style={{ display: "flex" }}>
         <div style={{ width: "50%" }}>
-          {/* <div className={exampleChildClass}>{selectionDetails}</div>
+          {/* <div className={exampleChildClass}>{selectedItems}</div>
           <Text>
             Note: While focusing a row, pressing enter or double clicking will execute onItemInvoked, which in this
             example will show an alert.
           </Text>
-          <Announced message={selectionDetails} /> */}
+          <Announced message={selectedItems} /> */}
           <TextField
             className={exampleChildClass}
             label="Filter by name:"
             // onChange={this._onFilter}
             styles={textFieldStyles}
           />
-          <Announced message={`Number of items after filter applied: ${items.length}.`} />
+          {/* <Announced message={`Number of items after filter applied: ${items.length}.`} /> */}
           <MarqueeSelection selection={this._selection}>
             <DetailsList
               items={items}
@@ -77,27 +79,16 @@ console.log('props.allItems :>> ', props.allItems);
               ariaLabelForSelectionColumn="Toggle selection"
               ariaLabelForSelectAllCheckbox="Toggle selection for all items"
               checkButtonAriaLabel="select row"
-              onItemInvoked={this._onItemInvoked}
+              // onItemInvoked={this._onItemInvoked}
             />
           </MarqueeSelection>
         </div>
-      {invockedItem !== '' &&  <MainStage />}
+      {selectedItems.length && <MainStage items={selectedItems} />}
       </div>
     );
   }
 
-  // private _getSelectionDetails(): string {
-  //   const selectionCount = this._selection.getSelectedCount();
-
-  //   switch (selectionCount) {
-  //     case 0:
-  //       return 'No items selected';
-  //     case 1:
-  //       return '1 item selected: ' + (this._selection.getSelection()[0] as DetailsListItem).name;
-  //     default:
-  //       return `${selectionCount} items selected`;
-  //   }
-  // }
+  private _getSelectedItems = (): MappedItem[] => this._selection.getSelection().map(this._mapSelectedItems);
 
   // private _onFilter = (
   //   ev: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -110,7 +101,7 @@ console.log('props.allItems :>> ', props.allItems);
 
   private _onItemInvoked = (item: DetailsListItem): void => {
     // console.log(`Item invoked: ${item.name}`);
-    this.setState({ invockedItem: item.sampleTrackerNumber });
+    // this.setState({ invockedItem: item.sampleTrackerNumber });
   };
 
   private _initColumns = (columns: Column[]) => {

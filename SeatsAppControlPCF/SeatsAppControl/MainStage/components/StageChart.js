@@ -53,12 +53,15 @@ const StageChart = ({ size, seats }) => {
 
   const handleSelect = React.useCallback(
     seatId => {
+console.log(`seatId`, seatId)
+console.log(`selectedSeatsIds`, selectedSeatsIds)
       // const newIds = selectedSeatsIds.concat(filterData(selectedRows?.seats?.sections))
+      const newIds = selectedSeatsIds.concat(seatId);
 
         // select index numbers of array based on number of rows selected form selectedRows
         // update array
 
-      // setSelectedSeatsIds(newIds);
+      setSelectedSeatsIds(newIds);
       // console.log(newIds);
     },
     [selectedSeatsIds]
