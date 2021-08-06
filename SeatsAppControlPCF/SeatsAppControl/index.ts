@@ -3,13 +3,13 @@ import { IInputs, IOutputs } from './generated/ManifestTypes';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import { DetailsListItem, Column, MappedItem, MapSelectedItems } from './types';
+import { DetailsListItem, DetailsListColumn, UpdateDetailsListItem } from './types';
 import SeatsDetailsList from './SeatsDetailsList';
 
 type Props = {
   allItems: DetailsListItem[];
-  columns: Column[];
-  mapSelectedItems: MapSelectedItems;
+  columns: DetailsListColumn[];
+  updateItem: UpdateDetailsListItem;
 };
 
 export class SeatsAppControl implements ComponentFramework.StandardControl<IInputs, IOutputs> {
@@ -42,17 +42,19 @@ export class SeatsAppControl implements ComponentFramework.StandardControl<IInpu
     this._props = {
       allItems: [],
       columns: [],
-      mapSelectedItems: this._mapSelectedItems
+      updateItem: this._updateItem
     };
 console.log(`context`, context)
     const errorMessage = 'Contact Your Administrator with Error: "FetchXML did not return Details List"';
     try {
       // this._props.allItems = await this._getSeatsDetails();
       this._props.allItems = [{
+        key: 1,
         sampleTrackerNumber: 'Sample Tracker Number 1',
         platePositionNumber: null,
         binLocation: 'Bin Location 1'
       }, {
+        key: 2,
         sampleTrackerNumber: 'Sample Tracker Number 2',
         platePositionNumber: null,
         binLocation: 'Bin Location 2'
@@ -101,7 +103,6 @@ console.log(`context`, context)
       entityProperty,
       sampleTrackerNumber,
       platePositionNumber,
-      zoneLocation,
       binLocation
     } = this._context.parameters;
 
@@ -109,7 +110,6 @@ console.log(`context`, context)
       this._validateProperty(entityProperty, 'Entity Property');
       this._validateProperty(sampleTrackerNumber, 'Sample Tracker Number');
       this._validateProperty(platePositionNumber, 'Plate Position Number');
-      this._validateProperty(zoneLocation, 'Zone Location');
       this._validateProperty(binLocation, 'Bin Location', true);
     } catch(error) {
       throw error;
@@ -120,7 +120,6 @@ console.log(`context`, context)
     fetchXML += `<entity name='${entityProperty.raw}'>`;
     fetchXML += `<attribute name='${sampleTrackerNumber.raw}' />`;
     fetchXML += `<attribute name='${platePositionNumber.raw}' />`;
-    fetchXML += `<attribute name='${zoneLocation.raw}' />`;
     // @ts-ignore
     fetchXML += `<attribute name='${binLocation.attributes.LogicalName}' />`;
     fetchXML += "</entity>";
@@ -136,13 +135,13 @@ console.log(`context`, context)
 console.log(response)
       const result: DetailsListItem[] = [];
 
-      response.entities.forEach(entity => {
+      response.entities.forEach((entity, index) => {
         // @ts-ignore
         const binLocationValue: string | undefined = entity[binLocation.attributes.LogicalName];
 
         if (binLocationValue) {
           result.push({
-            // key: index,
+            key: index,
             // @ts-ignore
             sampleTrackerNumber: entity[sampleTrackerNumber.raw],
             // @ts-ignore
@@ -173,12 +172,13 @@ console.log(`error`, error)
 
   private _getColumns = () => {
     return [
-      { key: 'sampleTrackerNumber', name: 'Sample Tracker Number', fieldName: 'sampleTrackerNumber', },
-      { key: 'platePositionNumber', name: 'Plate Position Number', fieldName: 'platePositionNumber', },
-      // { key: 'zoneLocation', name: 'Zone Location', fieldName: 'zoneLocation', },
-      // { key: 'binLocation', name: 'Bin Location', fieldName: 'binLocation', }
+      { key: 'sampleTrackerNumber', name: 'Sample Tracker Number', fieldName: 'sampleTrackerNumber' },
+      { key: 'platePositionNumber', name: 'Plate Position Number', fieldName: 'platePositionNumber' }
     ];
   }
 
-  private _mapSelectedItems = ({ binLocation }: { binLocation: string }): MappedItem => ({ binLocation });
+  private _updateItem = (
+    item: DetailsListItem,
+    value: string
+  ): DetailsListItem => ({ ...item, platePositionNumber: value });
 }

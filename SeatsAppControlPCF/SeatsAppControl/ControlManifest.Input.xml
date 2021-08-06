@@ -21,7 +21,6 @@
     <property name="entityProperty" display-name-key="Entity" description-key="Entity" of-type="SingleLine.Text" usage="input" required="true" />
     <property name="sampleTrackerNumber" display-name-key="SampleTrackerNumber" description-key="Sample Tracker Number" of-type="SingleLine.Text" usage="input" required="true" />
     <property name="platePositionNumber" display-name-key="PlatePositionNumber" description-key="Plate Position Number" of-type="SingleLine.Text" usage="input" required="true" />
-    <property name="zoneLocation" display-name-key="ZoneLocation" description-key="Zone Location" of-type="SingleLine.Text" usage="input" required="true" />
     <property name="binLocation" display-name-key="BinLocation" description-key="Bin Location" of-type="OptionSet" usage="bound" required="true" />
     <resources>
       <code path="index.ts" order="1"/>

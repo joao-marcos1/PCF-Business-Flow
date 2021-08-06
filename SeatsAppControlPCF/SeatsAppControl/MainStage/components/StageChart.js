@@ -5,7 +5,7 @@ import SeatPopup from './SeatPopup';
 import * as layout from '../utils/layout';
 import filterData from '../utils/filterData';
 
-const StageChart = ({ size, seats }) => {
+const StageChart = ({ size, seats, items, setField }) => {
   const stageRef = React.useRef(null);
 
   const [scale, setScale] = React.useState(1);
@@ -16,7 +16,9 @@ const StageChart = ({ size, seats }) => {
   const [selectedSeatsIds, setSelectedSeatsIds] = React.useState([]);
 
   const [popup, setPopup] = React.useState({ seat: null });
-
+console.group("StageChart")
+console.log(`items`, items)
+console.groupEnd()
   // calculate initial scale
   React.useEffect(() => {
     if (!stageRef.current) {
@@ -55,16 +57,18 @@ const StageChart = ({ size, seats }) => {
     seatId => {
 console.log(`seatId`, seatId)
 console.log(`selectedSeatsIds`, selectedSeatsIds)
-      // const newIds = selectedSeatsIds.concat(filterData(selectedRows?.seats?.sections))
       const newIds = selectedSeatsIds.concat(seatId);
-
-        // select index numbers of array based on number of rows selected form selectedRows
-        // update array
-
-      setSelectedSeatsIds(newIds);
-      // console.log(newIds);
+      const freePlate = items.find(item => item.platePositionNumber === null);
+console.group("handleSelect")
+console.log(`items`, items)
+console.log(`freePlate`, freePlate)
+console.groupEnd()
+      if (freePlate) {
+        setSelectedSeatsIds(newIds);
+        setField(freePlate.key, seatId);
+      }
     },
-    [selectedSeatsIds]
+    [selectedSeatsIds, items]
   );
 
   const handleDeselect = React.useCallback(

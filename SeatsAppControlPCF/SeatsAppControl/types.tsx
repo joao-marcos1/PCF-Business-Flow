@@ -1,19 +1,14 @@
 export type DetailsListItem = {
-  // key: number;
+  key: number;
   sampleTrackerNumber: string;
   platePositionNumber: string | null;
-  // zoneLocation: string;
   binLocation: string;
 };
 
-export type Column = {
+export type DetailsListColumn = {
   key: string;
   name: string;
   fieldName: string;
 };
 
-export type MappedItem = {
-  binLocation: string;
-};
-
-export type MapSelectedItems = (item: any) => MappedItem;
+export type UpdateDetailsListItem = (item: DetailsListItem, value: string) => DetailsListItem;

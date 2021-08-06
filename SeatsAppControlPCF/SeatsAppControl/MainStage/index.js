@@ -2,10 +2,12 @@ import React from 'react';
 import StageChart from './components/StageChart';
 import useFetch from './utils/useFetch';
 
-const MainStage = ({ items }) => {
+const MainStage = ({ items, setField }) => {
   const seatsData = useFetch('./utils/seats-data.json');
   const containerRef = React.useRef(null);
-
+console.group("MainStage")
+console.log(`items`, items)
+console.groupEnd()
   const [size, setSize] = React.useState({
     width: 1000,
     height: 1000
@@ -39,6 +41,8 @@ const MainStage = ({ items }) => {
       <StageChart
         size={size}
         seats={seatsData.seats}
+        items={items}
+        setField={setField}
       />
     </div>
   );

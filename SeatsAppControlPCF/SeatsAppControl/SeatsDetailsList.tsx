@@ -1,10 +1,14 @@
 import * as React from 'react';
 
-import { DetailsListItem, Column, MappedItem, MapSelectedItems } from './types';
+import { DetailsListItem, DetailsListColumn, UpdateDetailsListItem } from './types';
 
 import { Announced } from '@fluentui/react/lib/Announced';
 import { TextField, ITextFieldStyles } from '@fluentui/react/lib/TextField';
-import { DetailsList, DetailsListLayoutMode, Selection, IColumn } from '@fluentui/react/lib/DetailsList';
+import {
+  DetailsList, DetailsListLayoutMode,
+  Selection,
+  IColumn, IObjectWithKey
+} from '@fluentui/react/lib/DetailsList';
 import { MarqueeSelection } from '@fluentui/react/lib/MarqueeSelection';
 import { mergeStyles } from '@fluentui/react/lib/Styling';
 import { Text } from '@fluentui/react/lib/Text';
@@ -20,15 +24,14 @@ const textFieldStyles: Partial<ITextFieldStyles> = { root: { maxWidth: '300px' }
 
 interface DetailsListState {
   items: DetailsListItem[];
-  selectedItems: MappedItem[];
-  // invockedItem: string;
+  selectedItems: IObjectWithKey[];
 }
 
 class SeatsDetailsList extends React.Component<{}, DetailsListState> {
   private _selection: Selection;
   private _allItems: DetailsListItem[];
   private _columns: IColumn[];
-  private _mapSelectedItems: MapSelectedItems;
+  private _updateItem: UpdateDetailsListItem;
 
   constructor(props: any) {
     super(props);
@@ -37,21 +40,22 @@ class SeatsDetailsList extends React.Component<{}, DetailsListState> {
       onSelectionChanged: () => this.setState({ selectedItems: this._getSelectedItems() }),
     });
 console.log('props.allItems :>> ', props.allItems);
-    // Populate with items for demos.
     this._allItems = props.allItems;
     this._initColumns(props.columns);
-    this._mapSelectedItems = props.mapSelectedItems;
+    this._updateItem = props.updateItem;
 
     this.state = {
       items: this._allItems,
-      selectedItems: this._getSelectedItems(),
-      // invockedItem: '',
+      selectedItems: this._getSelectedItems()
     };
   }
 
   public render(): JSX.Element {
-    const { items, selectedItems/*, invockedItem*/ } = this.state;
-
+    const { items, selectedItems } = this.state;
+console.group('render');
+console.log('items :>> ', items);
+console.log('selectedItems :>> ', selectedItems);
+console.groupEnd();
     return (
       <div style={{ display: "flex" }}>
         <div style={{ width: "50%" }}>
@@ -79,16 +83,20 @@ console.log('props.allItems :>> ', props.allItems);
               ariaLabelForSelectionColumn="Toggle selection"
               ariaLabelForSelectAllCheckbox="Toggle selection for all items"
               checkButtonAriaLabel="select row"
-              // onItemInvoked={this._onItemInvoked}
             />
           </MarqueeSelection>
         </div>
-      {selectedItems.length && <MainStage items={selectedItems} />}
+      {selectedItems.length ?
+        <MainStage
+          items={selectedItems}
+          setField={this._setField}
+        />
+      : null}
       </div>
     );
   }
 
-  private _getSelectedItems = (): MappedItem[] => this._selection.getSelection().map(this._mapSelectedItems);
+  private _getSelectedItems = () => this._selection.getSelection();
 
   // private _onFilter = (
   //   ev: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -99,12 +107,7 @@ console.log('props.allItems :>> ', props.allItems);
   //   });
   // };
 
-  private _onItemInvoked = (item: DetailsListItem): void => {
-    // console.log(`Item invoked: ${item.name}`);
-    // this.setState({ invockedItem: item.sampleTrackerNumber });
-  };
-
-  private _initColumns = (columns: Column[]) => {
+  private _initColumns = (columns: DetailsListColumn[]): void => {
     this._columns = columns.map(({ key, name, fieldName }) => ({
       key,
       name,
@@ -114,6 +117,21 @@ console.log('props.allItems :>> ', props.allItems);
       isResizable: true
     }));
   }
+
+  private _setField = (key: number, value: string): void => this.setState(({ items, selectedItems }) => {
+    const mapItem = (item: any) => {
+      if (item.key === key) {
+        return this._updateItem(item, value);
+      }
+
+      return item;
+    };
+
+    return {
+      items: items.map(mapItem),
+      selectedItems: selectedItems.map(mapItem)
+    }
+  });
 }
 
 export default SeatsDetailsList;
