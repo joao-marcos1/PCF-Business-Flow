@@ -12,3 +12,8 @@ export type DetailsListColumn = {
 };
 
 export type UpdateDetailsListItem = (item: DetailsListItem, value: string) => DetailsListItem;
+
+export type Message = {
+  type: 'error' | 'warning' | null;
+  text?: string;
+};

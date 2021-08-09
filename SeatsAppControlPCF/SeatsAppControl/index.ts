@@ -3,13 +3,19 @@ import { IInputs, IOutputs } from './generated/ManifestTypes';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import { DetailsListItem, DetailsListColumn, UpdateDetailsListItem } from './types';
+import {
+  DetailsListItem,
+  DetailsListColumn,
+  UpdateDetailsListItem,
+  Message
+} from './types';
 import SeatsDetailsList from './SeatsDetailsList';
 
 type Props = {
   allItems: DetailsListItem[];
   columns: DetailsListColumn[];
   updateItem: UpdateDetailsListItem;
+  message: Message
 };
 
 export class SeatsAppControl implements ComponentFramework.StandardControl<IInputs, IOutputs> {
@@ -41,32 +47,37 @@ export class SeatsAppControl implements ComponentFramework.StandardControl<IInpu
     this._container = container;
     this._props = {
       allItems: [],
-      columns: [],
-      updateItem: this._updateItem
+      columns: this._getColumns(),
+      updateItem: this._updateItem,
+      message: {
+        type: null
+      }
     };
 console.log(`context`, context)
-    const errorMessage = 'Contact Your Administrator with Error: "FetchXML did not return Details List"';
     try {
-      // this._props.allItems = await this._getSeatsDetails();
-      this._props.allItems = [{
-        key: 1,
-        sampleTrackerNumber: 'Sample Tracker Number 1',
-        platePositionNumber: null,
-        binLocation: 'Bin Location 1'
-      }, {
-        key: 2,
-        sampleTrackerNumber: 'Sample Tracker Number 2',
-        platePositionNumber: null,
-        binLocation: 'Bin Location 2'
-      }];
-      this._props.columns = this._getColumns();
+      this._props.allItems = await this._getSeatsDetails();
+
+// this._props.allItems = [];
+// this._props.allItems = [{
+//   key: 1,
+//   sampleTrackerNumber: 'Sample Tracker Number 1',
+//   platePositionNumber: null,
+//   binLocation: 'Bin Location 1'
+// }, {
+//   key: 2,
+//   sampleTrackerNumber: 'Sample Tracker Number 2',
+//   platePositionNumber: null,
+//   binLocation: 'Bin Location 2'
+// }];
+      if (!this._props.allItems.length) {
+        this._props.message.type = 'warning';
+        this._props.message.text = 'No Samples to Load';
+      }
     } catch(error) {
-      alert(`${errorMessage}\nReason: "${error}"`);
-      return;
-    }
-    if (!this._props.allItems.length) {
-      alert(`${errorMessage}\nReason: "Empty array"`);
-      return;
+      const errorMessage = 'Contact Your Administrator with Error: "FetchXML did not return Details List".';
+
+      this._props.message.type = 'error';
+      this._props.message.text = `${errorMessage} Reason: "${error}"`;
     }
 
     ReactDOM.render(
@@ -122,6 +133,10 @@ console.log(`context`, context)
     fetchXML += `<attribute name='${platePositionNumber.raw}' />`;
     // @ts-ignore
     fetchXML += `<attribute name='${binLocation.attributes.LogicalName}' />`;
+    fetchXML += "<filter>";
+    // @ts-ignore
+      fetchXML += `<condition attribute='${binLocation.attributes.LogicalName}' operator='not-null' />`;
+    fetchXML += "</filter>";
     fetchXML += "</entity>";
     fetchXML += "</fetch>";
 
@@ -133,25 +148,15 @@ console.log(`context`, context)
         `?fetchXml=${encodeURIComponent(fetchXML)}`
       );
 console.log(response)
-      const result: DetailsListItem[] = [];
-
-      response.entities.forEach((entity, index) => {
+      return response.entities.map((entity, index) => ({
+        key: index,
         // @ts-ignore
-        const binLocationValue: string | undefined = entity[binLocation.attributes.LogicalName];
-
-        if (binLocationValue) {
-          result.push({
-            key: index,
-            // @ts-ignore
-            sampleTrackerNumber: entity[sampleTrackerNumber.raw],
-            // @ts-ignore
-            platePositionNumber: entity[platePositionNumber.raw] || null,
-            binLocation: binLocationValue
-          });
-        }
-      });
-
-      return result;
+        sampleTrackerNumber: entity[sampleTrackerNumber.raw],
+        // @ts-ignore
+        platePositionNumber: entity[platePositionNumber.raw] || null,
+        // @ts-ignore
+        binLocation: entity[binLocation.attributes.LogicalName]
+      }));
     } catch(error) {
 console.log(`error`, error)
       throw error.title;
