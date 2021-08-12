@@ -4,19 +4,12 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 import {
+  Props,
   DetailsListItem,
-  DetailsListColumn,
-  UpdateDetailsListItem,
-  Message
+  DetailsListItems,
+  DetailsListColumns
 } from './types';
-import SeatsDetailsList from './SeatsDetailsList';
-
-type Props = {
-  allItems: DetailsListItem[];
-  columns: DetailsListColumn[];
-  updateItem: UpdateDetailsListItem;
-  message: Message
-};
+import SeatsApp from './SeatsApp';
 
 export class SeatsAppControl implements ComponentFramework.StandardControl<IInputs, IOutputs> {
 
@@ -77,7 +70,7 @@ this._props.allItems = [{
     }
 
     ReactDOM.render(
-      React.createElement(SeatsDetailsList, this._props),
+      React.createElement(SeatsApp, this._props),
       this._container
     );
   }
@@ -104,7 +97,7 @@ this._props.allItems = [{
     ReactDOM.unmountComponentAtNode(this._container);
   }
 
-  private async _getSeatsDetails(): Promise<Array<DetailsListItem>> {
+  private async _getSeatsDetails(): Promise<DetailsListItems> {
 
     const {
       entityProperty,
@@ -171,7 +164,7 @@ console.log(`error`, error)
     }
   }
 
-  private _getColumns = () => {
+  private _getColumns = (): DetailsListColumns => {
     return [
       { key: 'sampleTrackerNumber', name: 'Sample Tracker Number', fieldName: 'sampleTrackerNumber' },
       { key: 'platePositionNumber', name: 'Plate Position Number', fieldName: 'platePositionNumber' }
