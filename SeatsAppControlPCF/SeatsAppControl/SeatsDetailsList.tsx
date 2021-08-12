@@ -42,7 +42,7 @@ class SeatsDetailsList extends React.Component<{}, DetailsListState> {
       onSelectionChanged: () => this.setState({ selectedItems: this._getSelectedItems() }),
     });
 console.log('props.allItems :>> ', props.allItems);
-    this._initColumns(props.columns);
+    this._columns = props.columns;
     this._updateItem = props.updateItem;
 
     this.state = {
@@ -89,28 +89,16 @@ console.groupEnd();
             />
           </MarqueeSelection>
         </div>
-        {selectedItems.length ?
-          <MainStage
-            items={selectedItems}
-            setField={this._setField}
-          />
-        : null}
+        <MainStage
+          items={items}
+          selectedItems={selectedItems}
+          setField={this._setField}
+        />
       </Stack>
     );
   }
 
   private _getSelectedItems = () => this._selection.getSelection();
-
-  private _initColumns = (columns: DetailsListColumn[]): void => {
-    this._columns = columns.map(({ key, name, fieldName }) => ({
-      key,
-      name,
-      fieldName,
-      minWidth: 100,
-      maxWidth: 200,
-      isResizable: true
-    }));
-  }
 
   private _setField = (key: number, value: string): void => this.setState(({ items, selectedItems }) => {
     const mapItem = (item: any) => {

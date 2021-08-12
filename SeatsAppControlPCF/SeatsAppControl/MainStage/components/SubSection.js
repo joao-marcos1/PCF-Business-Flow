@@ -12,7 +12,8 @@ export default ({
   onHoverSeat,
   onSelectSeat,
   onDeselectSeat,
-  selectedSeatsIds
+  selectedSeatsIds,
+  unavailableSeatsIds
 }) => {
   return (
     <Group x={x} y={y}>
@@ -31,6 +32,7 @@ export default ({
                   onSelect={onSelectSeat}
                   onDeselect={onDeselectSeat}
                   isSelected={selectedSeatsIds.indexOf(seat.name) >= 0}
+                  isUnavailable={unavailableSeatsIds.indexOf(seat.name) >= 0}
                 />
               );
             })}

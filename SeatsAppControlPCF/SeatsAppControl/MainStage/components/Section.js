@@ -18,6 +18,7 @@ export default React.memo(
     onSelectSeat,
     onDeselectSeat,
     selectedSeatsIds,
+    unavailableSeatsIds
   }) => {
     const containerRef = React.useRef();
 
@@ -55,6 +56,7 @@ export default React.memo(
               onSelectSeat={onSelectSeat}
               onDeselectSeat={onDeselectSeat}
               selectedSeatsIds={selectedSeatsIds}
+              unavailableSeatsIds={unavailableSeatsIds}
             />
           );
         })}

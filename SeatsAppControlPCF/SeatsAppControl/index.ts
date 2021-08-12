@@ -55,20 +55,16 @@ export class SeatsAppControl implements ComponentFramework.StandardControl<IInpu
     };
 console.log(`context`, context)
     try {
-      this._props.allItems = await this._getSeatsDetails();
+      // this._props.allItems = await this._getSeatsDetails();
 
 // this._props.allItems = [];
-// this._props.allItems = [{
-//   key: 1,
-//   sampleTrackerNumber: 'Sample Tracker Number 1',
-//   platePositionNumber: null,
-//   binLocation: 'Bin Location 1'
-// }, {
-//   key: 2,
-//   sampleTrackerNumber: 'Sample Tracker Number 2',
-//   platePositionNumber: null,
-//   binLocation: 'Bin Location 2'
-// }];
+this._props.allItems = [{
+  key: 1, sampleTrackerNumber: 'Sample Tracker Number 1', platePositionNumber: null, binLocation: 'Bin Location 1'
+}, {
+  key: 2, sampleTrackerNumber: 'Sample Tracker Number 2', platePositionNumber: null, binLocation: 'Bin Location 1'
+}, {
+  key: 3, sampleTrackerNumber: 'Sample Tracker Number 3', platePositionNumber: null, binLocation: 'Bin Location 1'
+}];
       if (!this._props.allItems.length) {
         this._props.message.type = 'warning';
         this._props.message.text = 'No Samples to Load';
@@ -179,7 +175,14 @@ console.log(`error`, error)
     return [
       { key: 'sampleTrackerNumber', name: 'Sample Tracker Number', fieldName: 'sampleTrackerNumber' },
       { key: 'platePositionNumber', name: 'Plate Position Number', fieldName: 'platePositionNumber' }
-    ];
+    ].map(({ key, name, fieldName }) => ({
+      key,
+      name,
+      fieldName,
+      minWidth: 100,
+      maxWidth: 200,
+      isResizable: true
+    }));
   }
 
   private _updateItem = (

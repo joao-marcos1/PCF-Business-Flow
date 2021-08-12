@@ -30,7 +30,7 @@ export default {
                 },
                 {
                   "name": "Bronze-B1-1-5",
-                  "status": "booked"
+                  "status": "free"
                 },
                 {
                   "name": "Bronze-B1-1-6",
