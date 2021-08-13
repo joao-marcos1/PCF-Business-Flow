@@ -1,10 +1,6 @@
-import * as React from 'react';
+import React from 'react';
 
-import {
-  DetailsListItems,
-  DetailsListColumns,
-  SelectedItems
-} from './types';
+import { DetailsListItems, DetailsListColumns } from './types';
 
 import {
   DetailsList,

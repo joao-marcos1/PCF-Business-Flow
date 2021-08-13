@@ -100,11 +100,11 @@ export default {
                 },
                 {
                   "name": "Bronze-B1-2-8",
-                  "status": "booked"
+                  "status": "free"
                 },
                 {
                   "name": "Bronze-B1-2-9",
-                  "status": "booked"
+                  "status": "free"
                 },
                 {
                   "name": "Bronze-B1-2-10",
@@ -112,11 +112,11 @@ export default {
                 },
                 {
                   "name": "Bronze-B1-2-11",
-                  "status": "booked"
+                  "status": "free"
                 },
                 {
                   "name": "Bronze-B1-2-12",
-                  "status": "booked"
+                  "status": "free"
                 },
                 {
                   "name": "Bronze-B1-2-13",

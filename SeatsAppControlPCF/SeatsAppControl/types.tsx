@@ -20,6 +20,8 @@ export interface DetailsListColumn {
 
 export type DetailsListColumns = DetailsListColumn[];
 
+export type FreeSeatsIds = string[];
+
 export type UpdateDetailsListItem = (item: DetailsListItem, value: string) => DetailsListItem;
 
 export interface Message {
@@ -30,6 +32,8 @@ export interface Message {
 export interface Props {
   allItems: DetailsListItems;
   columns: DetailsListColumns;
+  seatsSchema: {};
+  freeSeatsIds: FreeSeatsIds;
   updateItem: UpdateDetailsListItem;
   message: Message
 };

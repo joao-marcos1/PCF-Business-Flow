@@ -1,15 +1,18 @@
 import { IInputs, IOutputs } from './generated/ManifestTypes';
 
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+import React from 'react';
+import ReactDOM from 'react-dom';
 
 import {
   Props,
   DetailsListItem,
   DetailsListItems,
-  DetailsListColumns
+  DetailsListColumns,
+  FreeSeatsIds
 } from './types';
 import SeatsApp from './SeatsApp';
+
+import json from './seats-data.js';
 
 export class SeatsAppControl implements ComponentFramework.StandardControl<IInputs, IOutputs> {
 
@@ -41,6 +44,8 @@ export class SeatsAppControl implements ComponentFramework.StandardControl<IInpu
     this._props = {
       allItems: [],
       columns: this._getColumns(),
+      seatsSchema: {},
+      freeSeatsIds: [],
       updateItem: this._updateItem,
       message: {
         type: null
@@ -56,17 +61,23 @@ this._props.allItems = [{
 }, {
   key: 2, sampleTrackerNumber: 'Sample Tracker Number 2', platePositionNumber: null, binLocation: 'Bin Location 1'
 }, {
-  key: 3, sampleTrackerNumber: 'Sample Tracker Number 3', platePositionNumber: null, binLocation: 'Bin Location 1'
+  key: 3, sampleTrackerNumber: 'Sample Tracker Number 3', platePositionNumber: 'number', binLocation: 'Bin Location 1'
+}, {
+  key: 4, sampleTrackerNumber: 'Sample Tracker Number 3', platePositionNumber: null, binLocation: 'Bin Location 1'
+}, {
+  key: 5, sampleTrackerNumber: 'Sample Tracker Number 3', platePositionNumber: null, binLocation: 'Bin Location 1'
 }];
       if (!this._props.allItems.length) {
-        this._props.message.type = 'warning';
-        this._props.message.text = 'No Samples to Load';
+        throw {
+          type: 'warning',
+          text: 'No Samples to Load'
+        };
       }
-    } catch(error) {
-      const errorMessage = 'Contact Your Administrator with Error: "FetchXML did not return Details List".';
 
-      this._props.message.type = 'error';
-      this._props.message.text = `${errorMessage} Reason: "${error}"`;
+      this._props.seatsSchema = this._getSeatsSchema();
+      this._props.freeSeatsIds = this._getFreeSeats(this._props.seatsSchema);
+    } catch({ type, text }) {
+      this._props.message = { type, text };
     }
 
     ReactDOM.render(
@@ -98,7 +109,7 @@ this._props.allItems = [{
   }
 
   private async _getSeatsDetails(): Promise<DetailsListItems> {
-
+    const errorMessage = 'Contact Your Administrator with Error: "FetchXML did not return Details List".';
     const {
       entityProperty,
       sampleTrackerNumber,
@@ -112,7 +123,10 @@ this._props.allItems = [{
       this._validateProperty(platePositionNumber, 'Plate Position Number');
       this._validateProperty(binLocation, 'Bin Location', true);
     } catch(error) {
-      throw error;
+      throw {
+        type: 'error',
+        text: `${errorMessage} Reason: "${error}"`
+      };
     }
 
     let fetchXML: string = "";
@@ -148,7 +162,10 @@ console.log(response)
       }));
     } catch(error) {
 console.log(`error`, error)
-      throw error.title;
+      throw {
+        type: 'error',
+        text: `${errorMessage} Reason: "${error.title}"`
+      };
     }
   }
 
@@ -176,6 +193,30 @@ console.log(`error`, error)
       maxWidth: 200,
       isResizable: true
     }));
+  }
+
+  private _getSeatsSchema = () => {
+    return json;
+  }
+
+  private _getFreeSeats = (seatsSchema: any): FreeSeatsIds => {
+    let freeSeatsIds: string[] = [];
+
+    seatsSchema.seats.sections.forEach(({ subsections }: { subsections: any }) => {
+      subsections.forEach(({ seats_by_rows }: { seats_by_rows: any }) => {
+        Object.keys(seats_by_rows).forEach(key => {
+          const row = seats_by_rows[key];
+
+          row.forEach((seat: any) => {
+            if (seat.status === 'free') {
+              freeSeatsIds.push(seat.name);
+            }
+          });
+        });
+      });
+    });
+
+    return freeSeatsIds;
   }
 
   private _updateItem = (

@@ -1,34 +1,20 @@
 import React from 'react';
 import StageChart from './components/StageChart';
-import useFetch from './utils/useFetch';
+import useCalcSpace from './utils/useCalcSpace';
 
-const MainStage = ({ items, selectedItems, setField }) => {
-  const seatsData = useFetch('./utils/seats-data.json');
-  const containerRef = React.useRef(null);
+const MainStage = ({
+  seatsSchema,
+  freeSeatsIds,
+  items,
+  selectedItems,
+  setField
+}) => {
 console.group("MainStage")
 console.log(`items`, items)
 console.log(`selectedItems`, selectedItems)
+  const [size, containerRef] = useCalcSpace(500, 500);
+console.log(`size`, size)
 console.groupEnd()
-  const [size, setSize] = React.useState({
-    width: 1000,
-    height: 1000
-  });
-
-  // calculate available space for drawing
-  React.useEffect(() => {
-    const newSize = {
-      width: containerRef.current.offsetWidth,
-      height: containerRef.current.offsetHeight
-    };
-    if (newSize.width !== size.width || newSize.height !== size.height) {
-      setSize(newSize);
-    }
-  });
-
-  if (seatsData === null) {
-    return <div ref={containerRef}>Loading...</div>;
-  }
-
   return (
     <div
       style={{
@@ -41,7 +27,8 @@ console.groupEnd()
     >
       <StageChart
         size={size}
-        seats={seatsData.seats}
+        seats={seatsSchema.seats}
+        freeSeatsIds={freeSeatsIds}
         items={items}
         selectedItems={selectedItems}
         setField={setField}

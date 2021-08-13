@@ -31,6 +31,7 @@ const getSelectedSeatsIds = (rows, unavailableSeatsIds) => (
 const StageChart = ({
   size,
   seats,
+  freeSeatsIds,
   items,
   selectedItems,
   setField

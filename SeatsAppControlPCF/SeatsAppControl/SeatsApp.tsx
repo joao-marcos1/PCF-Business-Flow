@@ -23,11 +23,15 @@ const confirmButtonClass = mergeStyles({
 const SeatsApp = ({
   allItems,
   columns,
+  seatsSchema,
+  freeSeatsIds,
   updateItem,
   message
 }: Props) => {
 console.group('SeatApp');
 console.log('allItems :>> ', allItems);
+console.log('seatsSchema :>> ', seatsSchema);
+console.log('freeSeatsIds :>> ', freeSeatsIds);
 
   const [notification, setNotification] = useState<Message>(message);
 console.log('notification :>> ', notification);
@@ -82,6 +86,8 @@ console.groupEnd();
           selection={selection}
         />
         <MainStage
+          seatsSchema={seatsSchema}
+          freeSeatsIds={freeSeatsIds}
           items={items}
           selectedItems={selectedItems}
           setField={setField}
