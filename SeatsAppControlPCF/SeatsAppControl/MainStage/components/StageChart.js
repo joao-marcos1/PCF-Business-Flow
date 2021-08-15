@@ -3,38 +3,15 @@ import { Stage, Layer } from '../react-konva';
 import Section from './Section';
 import SeatPopup from './SeatPopup';
 import * as layout from '../utils/layout';
-import useFilterItems from '../utils/useFilterItems';
-
-const getUnavailableSeatsIds = (rows, selectedItems) => (
-  rows
-    .filter(
-      row => (
-        row.platePositionNumber !== null &&
-        !selectedItems.some(
-          selected => selected.platePositionNumber === row.platePositionNumber
-        )
-      )
-    )
-    .map(item => item.platePositionNumber)
-);
-const getSelectedSeatsIds = (rows, unavailableSeatsIds) => (
-  rows
-    .filter(
-      row => (
-        row.platePositionNumber !== null &&
-        unavailableSeatsIds.indexOf(row.platePositionNumber) === -1
-      )
-    )
-    .map(row => row.platePositionNumber)
-);
 
 const StageChart = ({
   size,
   seats,
-  freeSeatsIds,
   items,
-  selectedItems,
-  setField
+  unavailableSeatsIds,
+  selectedSeatsIds,
+  selectSeats,
+  deselectSeats
 }) => {
   const stageRef = useRef(null);
 
@@ -44,10 +21,7 @@ const StageChart = ({
   const [virtualOffset, setVirtualOffset] = useState(0);
 console.group("StageChart")
 console.log(`items`, items)
-console.log(`selectedItems`, selectedItems)
-  const [unavailableSeatsIds] = useFilterItems(items, selectedItems, getUnavailableSeatsIds);
 console.log(`unavailableSeatsIds`, unavailableSeatsIds)
-  const [selectedSeatsIds, setSelectedSeatsIds] = useFilterItems(items, unavailableSeatsIds, getSelectedSeatsIds);
 console.log(`selectedSeatsIds`, selectedSeatsIds)
 console.groupEnd()
   const [popup, setPopup] = useState({ seat: null });
@@ -85,43 +59,19 @@ console.groupEnd()
     });
   }, []);
 
-  const handleSelect = useCallback(
-    seatId => {
+  const handleSelect = seatId => {
 console.group("handleSelect")
 console.log(`seatId`, seatId)
-console.log(`selectedSeatsIds`, selectedSeatsIds)
-      const newIds = selectedSeatsIds.concat(seatId);
-      const freePlate = selectedItems.find(item => item.platePositionNumber === null);
-console.log(`selectedItems`, selectedItems)
-console.log(`freePlate`, freePlate)
+    selectSeats(seatId);
 console.groupEnd()
-      if (freePlate) {
-        setField(freePlate.key, seatId);
-        setSelectedSeatsIds(newIds);
-      }
-    },
-    [selectedSeatsIds, selectedItems]
-  );
+  };
 
-  const handleDeselect = useCallback(
-    seatId => {
+  const handleDeselect = seatId => {
 console.group("handleDeselect")
 console.log(`seatId`, seatId)
-console.log(`selectedSeatsIds`, selectedSeatsIds)
-
-      const plateToDeselect = selectedItems.find(item => item.platePositionNumber === seatId);
-console.log(`plateToDeselect`, plateToDeselect)
+    deselectSeats(seatId);
 console.groupEnd()
-      if (plateToDeselect) {
-        setField(plateToDeselect.key, null);
-
-        const ids = selectedSeatsIds.slice();
-        ids.splice(ids.indexOf(seatId), 1);
-        setSelectedSeatsIds(ids);
-      }
-    },
-    [selectedSeatsIds, selectedItems]
-  );
+  };
 
   const maxSectionWidth = layout.getMaximimSectionWidth(seats.sections);
 

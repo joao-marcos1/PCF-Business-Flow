@@ -1,6 +1,6 @@
 import { IObjectWithKey } from "@fluentui/react/lib/Utilities";
 
-export interface DetailsListItem {
+interface DetailsListItem {
   key: number;
   sampleTrackerNumber: string;
   platePositionNumber: string | null;
@@ -9,7 +9,7 @@ export interface DetailsListItem {
 
 export type DetailsListItems = DetailsListItem[];
 
-export interface DetailsListColumn {
+interface DetailsListColumn {
   key: string;
   name: string;
   fieldName: string;
@@ -22,8 +22,6 @@ export type DetailsListColumns = DetailsListColumn[];
 
 export type FreeSeatsIds = string[];
 
-export type UpdateDetailsListItem = (item: DetailsListItem, value: string) => DetailsListItem;
-
 export interface Message {
   type: 'error' | 'warning' | null;
   text?: string;
@@ -34,8 +32,5 @@ export interface Props {
   columns: DetailsListColumns;
   seatsSchema: {};
   freeSeatsIds: FreeSeatsIds;
-  updateItem: UpdateDetailsListItem;
   message: Message
 };
-
-export type SelectedItems = IObjectWithKey[];

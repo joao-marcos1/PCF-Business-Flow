@@ -5,7 +5,6 @@ import ReactDOM from 'react-dom';
 
 import {
   Props,
-  DetailsListItem,
   DetailsListItems,
   DetailsListColumns,
   FreeSeatsIds
@@ -46,7 +45,6 @@ export class SeatsAppControl implements ComponentFramework.StandardControl<IInpu
       columns: this._getColumns(),
       seatsSchema: {},
       freeSeatsIds: [],
-      updateItem: this._updateItem,
       message: {
         type: null
       }
@@ -61,11 +59,11 @@ this._props.allItems = [{
 }, {
   key: 2, sampleTrackerNumber: 'Sample Tracker Number 2', platePositionNumber: null, binLocation: 'Bin Location 1'
 }, {
-  key: 3, sampleTrackerNumber: 'Sample Tracker Number 3', platePositionNumber: 'number', binLocation: 'Bin Location 1'
+  key: 3, sampleTrackerNumber: 'Sample Tracker Number 3', platePositionNumber: 'pre-assigned 1', binLocation: 'Bin Location 1'
 }, {
-  key: 4, sampleTrackerNumber: 'Sample Tracker Number 3', platePositionNumber: null, binLocation: 'Bin Location 1'
+  key: 4, sampleTrackerNumber: 'Sample Tracker Number 4', platePositionNumber: null, binLocation: 'Bin Location 1'
 }, {
-  key: 5, sampleTrackerNumber: 'Sample Tracker Number 3', platePositionNumber: null, binLocation: 'Bin Location 1'
+  key: 5, sampleTrackerNumber: 'Sample Tracker Number 5', platePositionNumber: null, binLocation: 'Bin Location 1'
 }];
       if (!this._props.allItems.length) {
         throw {
@@ -218,9 +216,4 @@ console.log(`error`, error)
 
     return freeSeatsIds;
   }
-
-  private _updateItem = (
-    item: DetailsListItem,
-    value: string
-  ): DetailsListItem => ({ ...item, platePositionNumber: value });
 }

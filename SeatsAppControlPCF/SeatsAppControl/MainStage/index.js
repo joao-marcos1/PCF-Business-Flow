@@ -4,14 +4,14 @@ import useCalcSpace from './utils/useCalcSpace';
 
 const MainStage = ({
   seatsSchema,
-  freeSeatsIds,
   items,
-  selectedItems,
-  setField
+  unavailableSeatsIds,
+  selectedSeatsIds,
+  selectSeats,
+  deselectSeats
 }) => {
 console.group("MainStage")
 console.log(`items`, items)
-console.log(`selectedItems`, selectedItems)
   const [size, containerRef] = useCalcSpace(500, 500);
 console.log(`size`, size)
 console.groupEnd()
@@ -28,10 +28,11 @@ console.groupEnd()
       <StageChart
         size={size}
         seats={seatsSchema.seats}
-        freeSeatsIds={freeSeatsIds}
         items={items}
-        selectedItems={selectedItems}
-        setField={setField}
+        unavailableSeatsIds={unavailableSeatsIds}
+        selectedSeatsIds={selectedSeatsIds}
+        selectSeats={selectSeats}
+        deselectSeats={deselectSeats}
       />
     </div>
   );

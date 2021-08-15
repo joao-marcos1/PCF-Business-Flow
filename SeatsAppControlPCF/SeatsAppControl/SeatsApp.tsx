@@ -1,20 +1,16 @@
 import React, { useState } from 'react';
 
-import {
-  Props,
-  Message,
-  SelectedItems,
-  DetailsListItems
-} from './types';
+import { Props, Message } from './types';
+
+import useSeatsReducer from './MainStage/utils/useSeatsReducer';
 import NotificationBar from './NotificationBar';
+import SeatsDetailsList from './SeatsDetailsList';
+import MainStage from './MainStage';
 
 import { Stack } from '@fluentui/react/lib/Stack';
 import { PrimaryButton } from '@fluentui/react/lib/Button';
 import { Selection } from '@fluentui/react/lib/DetailsList';
 import { mergeStyles } from '@fluentui/react/lib/Styling';
-
-import MainStage from './MainStage';
-import SeatsDetailsList from './SeatsDetailsList';
 
 const confirmButtonClass = mergeStyles({
   marginTop: '20px'
@@ -25,7 +21,6 @@ const SeatsApp = ({
   columns,
   seatsSchema,
   freeSeatsIds,
-  updateItem,
   message
 }: Props) => {
 console.group('SeatApp');
@@ -35,10 +30,15 @@ console.log('freeSeatsIds :>> ', freeSeatsIds);
 
   const [notification, setNotification] = useState<Message>(message);
 console.log('notification :>> ', notification);
-  const [items, setItems] = useState<DetailsListItems>(allItems);
+  const [
+    { items, unavailableSeatsIds, selectedSeatsIds},
+    setSelectedItems,
+    selectSeats,
+    deselectSeats
+  ]: any = useSeatsReducer({ allItems, freeSeatsIds });
 console.log('items :>> ', items);
-  const [selectedItems, setSelectedItems] = useState<SelectedItems>([]);
-console.log('selectedItems :>> ', selectedItems);
+console.log('unavailableSeatsIds :>> ', unavailableSeatsIds);
+console.log('selectedSeatsIds :>> ', selectedSeatsIds);
 
   const selection: Selection = new Selection({
     onSelectionChanged: () => setSelectedItems(selection.getSelection()),
@@ -48,18 +48,6 @@ console.log('selectedItems :>> ', selectedItems);
     setNotification({ type: null });
   };
 
-  const setField = (key: number, value: string): void => {
-    const mapItem = (item: any) => {
-      if (item.key === key) {
-        return updateItem(item, value);
-      }
-
-      return item;
-    };
-
-    setItems(items => items.map(mapItem));
-    setSelectedItems(selectedItems => selectedItems.map(mapItem));
-  };
 console.groupEnd();
   return (
     <Stack horizontal={false}>
@@ -87,10 +75,11 @@ console.groupEnd();
         />
         <MainStage
           seatsSchema={seatsSchema}
-          freeSeatsIds={freeSeatsIds}
           items={items}
-          selectedItems={selectedItems}
-          setField={setField}
+          unavailableSeatsIds={unavailableSeatsIds}
+          selectedSeatsIds={selectedSeatsIds}
+          selectSeats={selectSeats}
+          deselectSeats={deselectSeats}
         />
       </Stack>
     </Stack>
