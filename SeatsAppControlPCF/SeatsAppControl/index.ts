@@ -44,7 +44,7 @@ export class SeatsAppControl implements ComponentFramework.StandardControl<IInpu
       allItems: [],
       columns: this._getColumns(),
       seatsSchema: {},
-      freeSeatsIds: [],
+      allFreeSeatsIds: [],
       message: {
         type: null
       }
@@ -60,7 +60,7 @@ console.log(`context`, context)
       }
 
       this._props.seatsSchema = this._getSeatsSchema();
-      this._props.freeSeatsIds = this._getFreeSeats(this._props.seatsSchema);
+      this._props.allFreeSeatsIds = this._getFreeSeats(this._props.seatsSchema);
     } catch({ type, text }) {
       this._props.message = { type, text };
     }

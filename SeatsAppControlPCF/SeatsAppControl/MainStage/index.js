@@ -5,6 +5,7 @@ import useCalcSpace from './utils/useCalcSpace';
 const MainStage = ({
   seatsSchema,
   items,
+  freeSeatsIds,
   unavailableSeatsIds,
   selectedSeatsIds,
   selectSeats,
@@ -29,6 +30,7 @@ console.groupEnd()
         size={size}
         seats={seatsSchema.seats}
         items={items}
+        freeSeatsIds={freeSeatsIds}
         unavailableSeatsIds={unavailableSeatsIds}
         selectedSeatsIds={selectedSeatsIds}
         selectSeats={selectSeats}

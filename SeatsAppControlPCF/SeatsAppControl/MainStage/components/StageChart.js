@@ -8,6 +8,7 @@ const StageChart = ({
   size,
   seats,
   items,
+  freeSeatsIds,
   unavailableSeatsIds,
   selectedSeatsIds,
   selectSeats,
@@ -39,7 +40,7 @@ console.groupEnd()
     setScaleToFit(scaleToFit);
     setVirtualWidth(clientRect.width);
     setVirtualOffset(Math.abs(clientRect.x));
-  }, [seats, size]);
+  }, [size]);
 
   // toggle scale on double clicks or taps
   const toggleScale = useCallback(() => {
@@ -53,25 +54,16 @@ console.groupEnd()
   let lastSectionPosition = 0;
 
   const handleHover = useCallback((seat, pos) => {
+    const item = items.find(item => item.platePositionNumber === seat);
+console.group("handleHover")
+console.log('item :>> ', item);
+console.groupEnd()
     setPopup({
       seat: seat,
-      position: pos
+      position: pos,
+      number: item && item.sampleTrackerNumber
     });
-  }, []);
-
-  const handleSelect = seatId => {
-console.group("handleSelect")
-console.log(`seatId`, seatId)
-    selectSeats(seatId);
-console.groupEnd()
-  };
-
-  const handleDeselect = seatId => {
-console.group("handleDeselect")
-console.log(`seatId`, seatId)
-    deselectSeats(seatId);
-console.groupEnd()
-  };
+  }, [items]);
 
   const maxSectionWidth = layout.getMaximimSectionWidth(seats.sections);
 
@@ -115,8 +107,8 @@ console.groupEnd()
                 selectedSeatsIds={selectedSeatsIds}
                 unavailableSeatsIds={unavailableSeatsIds}
                 onHoverSeat={handleHover}
-                onSelectSeat={handleSelect}
-                onDeselectSeat={handleDeselect}
+                onSelectSeat={selectSeats}
+                onDeselectSeat={deselectSeats}
               />
             );
           })}
@@ -127,6 +119,9 @@ console.groupEnd()
         <SeatPopup
           position={popup.position}
           seatId={popup.seat}
+          number={popup.number}
+          isFree={freeSeatsIds.indexOf(popup.seat) !== -1}
+          isSelected={selectedSeatsIds.indexOf(popup.seat) !== -1}
           onClose={() => {
             setPopup({ seat: null });
           }}

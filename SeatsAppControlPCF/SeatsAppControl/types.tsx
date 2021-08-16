@@ -30,6 +30,6 @@ export interface Props {
   allItems: DetailsListItems;
   columns: DetailsListColumns;
   seatsSchema: {};
-  freeSeatsIds: FreeSeatsIds;
+  allFreeSeatsIds: FreeSeatsIds;
   message: Message
 };

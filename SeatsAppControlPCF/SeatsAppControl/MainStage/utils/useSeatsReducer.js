@@ -4,7 +4,7 @@ const SET_SELECTED_ITEMS = 'SET_SELECTED_ITEMS';
 const SELECT_SEATS = 'SELECT_SEATS';
 const DESELECT_SEATS = 'DESELECT_SEATS';
 
-const init = ({ allItems, freeSeatsIds }) => {
+const init = ({ allItems, allFreeSeatsIds }) => {
   const items = {};
   const preAssignedItemsKeys = [];
   const freeSeatsOrder = {};
@@ -15,7 +15,7 @@ const init = ({ allItems, freeSeatsIds }) => {
       preAssignedItemsKeys.push(item.key);
     }
   });
-  freeSeatsIds.forEach((id, index) => {
+  allFreeSeatsIds.forEach((id, index) => {
     freeSeatsOrder[id] = index;
   });
 
@@ -24,7 +24,7 @@ const init = ({ allItems, freeSeatsIds }) => {
     selectedItemsKeys: [],
     preAssignedItemsKeys,
     freeSeats: {
-      ids: freeSeatsIds,
+      ids: allFreeSeatsIds,
       order: freeSeatsOrder
     },
     unavailableSeatsIds: [],
@@ -163,7 +163,12 @@ console.groupEnd()
 
 const useSeatsReducer = (initialState) => {
   const [
-    { items, unavailableSeatsIds, selectedSeatsIds },
+    {
+      items,
+      freeSeats: { ids: freeSeatsIds },
+      unavailableSeatsIds,
+      selectedSeatsIds
+    },
     dispatch
   ] = useReducer(seatsReducer, initialState, init);
 
@@ -191,6 +196,7 @@ console.groupEnd()
   return [
     {
       items: Object.values(items),
+      freeSeatsIds,
       unavailableSeatsIds,
       selectedSeatsIds
     },

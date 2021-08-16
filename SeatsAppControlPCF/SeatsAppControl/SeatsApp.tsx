@@ -20,22 +20,23 @@ const SeatsApp = ({
   allItems,
   columns,
   seatsSchema,
-  freeSeatsIds,
+  allFreeSeatsIds,
   message
 }: Props) => {
 console.group('SeatApp');
 console.log('allItems :>> ', allItems);
 console.log('seatsSchema :>> ', seatsSchema);
-console.log('freeSeatsIds :>> ', freeSeatsIds);
+console.log('allFreeSeatsIds :>> ', allFreeSeatsIds);
 
+  const isSeatsSchema = Boolean(Object.keys(seatsSchema).length);
   const [notification, setNotification] = useState<Message>(message);
 console.log('notification :>> ', notification);
   const [
-    { items, unavailableSeatsIds, selectedSeatsIds},
+    { items, freeSeatsIds, unavailableSeatsIds, selectedSeatsIds},
     setSelectedItems,
     selectSeats,
     deselectSeats
-  ]: any = useSeatsReducer({ allItems, freeSeatsIds });
+  ]: any = useSeatsReducer({ allItems, allFreeSeatsIds });
 console.log('items :>> ', items);
 console.log('unavailableSeatsIds :>> ', unavailableSeatsIds);
 console.log('selectedSeatsIds :>> ', selectedSeatsIds);
@@ -73,14 +74,17 @@ console.groupEnd();
           columns={columns}
           selection={selection}
         />
-        <MainStage
-          seatsSchema={seatsSchema}
-          items={items}
-          unavailableSeatsIds={unavailableSeatsIds}
-          selectedSeatsIds={selectedSeatsIds}
-          selectSeats={selectSeats}
-          deselectSeats={deselectSeats}
-        />
+        {isSeatsSchema ?
+          <MainStage
+            seatsSchema={seatsSchema}
+            items={items}
+            freeSeatsIds={freeSeatsIds}
+            unavailableSeatsIds={unavailableSeatsIds}
+            selectedSeatsIds={selectedSeatsIds}
+            selectSeats={selectSeats}
+            deselectSeats={deselectSeats}
+          />
+        : null}
       </Stack>
     </Stack>
   );

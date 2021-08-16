@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from 'react';
 
 const isClickedInside = (e, element) => {
   let node = e.target;
@@ -11,20 +11,37 @@ const isClickedInside = (e, element) => {
   return false;
 };
 
-const Popup = ({ position, seatId, onClose }) => {
-  const containerRef = React.useRef(null);
+const Popup = ({
+  position,
+  seatId,
+  number,
+  isFree,
+  isSelected,
+  onClose
+}) => {
+console.group("Popup")
+console.log(`number`, number)
+console.groupEnd()
+  const containerRef = useRef(null);
+  const clickLine = isFree ?
+    'Click on the seat to select'
+  : isSelected ?
+    'Click on the seat to deselect'
+  : 'Unavailable';
 
-  React.useEffect(() => {
+  useEffect(() => {
     const onClick = e => {
       if (!isClickedInside(e, containerRef.current)) {
         onClose();
       }
     };
     window.addEventListener("click", onClick);
+
     return () => {
       window.removeEventListener("click", onClick);
     };
   }, []);
+
   return (
     <div
       ref={containerRef}
@@ -40,7 +57,10 @@ const Popup = ({ position, seatId, onClose }) => {
       }}
     >
       <div>Seat {seatId}</div>
-      <div>Click on the seat to select</div>
+      {number ?
+        <div>{number}</div>
+      : null}
+      <div>{clickLine}</div>
     </div>
   );
 };
