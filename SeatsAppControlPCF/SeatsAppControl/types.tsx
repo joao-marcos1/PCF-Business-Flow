@@ -4,7 +4,6 @@ interface DetailsListItem {
   key: number;
   sampleTrackerNumber: string;
   platePositionNumber: string | null;
-  binLocation: string;
 };
 
 export type DetailsListItems = DetailsListItem[];

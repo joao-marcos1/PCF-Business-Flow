@@ -51,20 +51,7 @@ export class SeatsAppControl implements ComponentFramework.StandardControl<IInpu
     };
 console.log(`context`, context)
     try {
-      // this._props.allItems = await this._getSeatsDetails();
-
-// this._props.allItems = [];
-this._props.allItems = [{
-  key: 1, sampleTrackerNumber: 'Sample Tracker Number 1', platePositionNumber: null, binLocation: 'Bin Location 1'
-}, {
-  key: 2, sampleTrackerNumber: 'Sample Tracker Number 2', platePositionNumber: null, binLocation: 'Bin Location 1'
-}, {
-  key: 3, sampleTrackerNumber: 'Sample Tracker Number 3', platePositionNumber: 'pre-assigned 1', binLocation: 'Bin Location 1'
-}, {
-  key: 4, sampleTrackerNumber: 'Sample Tracker Number 4', platePositionNumber: null, binLocation: 'Bin Location 1'
-}, {
-  key: 5, sampleTrackerNumber: 'Sample Tracker Number 5', platePositionNumber: null, binLocation: 'Bin Location 1'
-}];
+      this._props.allItems = await this._getSeatsDetails();
       if (!this._props.allItems.length) {
         throw {
           type: 'warning',
@@ -132,8 +119,6 @@ this._props.allItems = [{
     fetchXML += `<entity name='${entityProperty.raw}'>`;
     fetchXML += `<attribute name='${sampleTrackerNumber.raw}' />`;
     fetchXML += `<attribute name='${platePositionNumber.raw}' />`;
-    // @ts-ignore
-    fetchXML += `<attribute name='${binLocation.attributes.LogicalName}' />`;
     fetchXML += "<filter>";
     // @ts-ignore
       fetchXML += `<condition attribute='${binLocation.attributes.LogicalName}' operator='not-null' />`;
@@ -154,9 +139,7 @@ console.log(response)
         // @ts-ignore
         sampleTrackerNumber: entity[sampleTrackerNumber.raw],
         // @ts-ignore
-        platePositionNumber: entity[platePositionNumber.raw] || null,
-        // @ts-ignore
-        binLocation: entity[binLocation.attributes.LogicalName]
+        platePositionNumber: entity[platePositionNumber.raw] || null
       }));
     } catch(error) {
 console.log(`error`, error)
