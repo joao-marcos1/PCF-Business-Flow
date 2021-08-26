@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useRef, useEffect } from 'react';
 import { Rect, Group, Text } from '../react-konva';
 import SubSection from './SubSection';
 
@@ -8,7 +8,7 @@ import {
   getSubsectionWidth,
 } from '../utils/layout';
 
-export default React.memo(
+export default memo(
   ({
     section,
     height,
@@ -20,15 +20,17 @@ export default React.memo(
     selectedSeatsIds,
     unavailableSeatsIds
   }) => {
-    const containerRef = React.useRef();
+    const containerRef = useRef();
 
     // caching will boost rendering
     // we just need to recache on some changes
-    React.useEffect(() => {
+    useEffect(() => {
       containerRef.current.cache();
     }, [section, selectedSeatsIds]);
+
     const width = getSectionWidth(section);
     let lastSubsectionX = 0;
+
     return (
       <Group y={y} x={x} ref={containerRef}>
         <Rect
@@ -39,16 +41,17 @@ export default React.memo(
           stroke="lightgrey"
           cornerRadius={5}
         />
-        {section.subsections.map((subsection) => {
+        {section.subsections.map((subsection, index) => {
           const subWidth = getSubsectionWidth(subsection);
           const pos = lastSubsectionX;
+
           lastSubsectionX += subWidth;
 
           return (
             <SubSection
               x={pos}
               y={SECTION_TOP_PADDING}
-              key={subsection.name}
+              key={index}
               data={subsection}
               width={subWidth}
               height={height}

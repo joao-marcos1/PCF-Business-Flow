@@ -3,15 +3,8 @@ import { IInputs, IOutputs } from './generated/ManifestTypes';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import {
-  Props,
-  DetailsListItems,
-  DetailsListColumns,
-  FreeSeatsIds
-} from './types';
+import { Props } from './types';
 import SeatsApp from './SeatsApp';
-
-import json from './seats-data.js';
 
 export class SeatsAppControl implements ComponentFramework.StandardControl<IInputs, IOutputs> {
 
@@ -42,7 +35,7 @@ export class SeatsAppControl implements ComponentFramework.StandardControl<IInpu
     this._container = container;
     this._props = {
       allItems: [],
-      columns: this._getColumns(),
+      columns: [],
       seatsSchema: {},
       allFreeSeatsIds: [],
       message: {
@@ -50,20 +43,7 @@ export class SeatsAppControl implements ComponentFramework.StandardControl<IInpu
       }
     };
 console.log(`context`, context)
-    try {
-      this._props.allItems = await this._getSeatsDetails();
-      if (!this._props.allItems.length) {
-        throw {
-          type: 'warning',
-          text: 'No Samples to Load'
-        };
-      }
-
-      this._props.seatsSchema = this._getSeatsSchema();
-      this._props.allFreeSeatsIds = this._getFreeSeats(this._props.seatsSchema);
-    } catch({ type, text }) {
-      this._props.message = { type, text };
-    }
+    await this._initProps();
 
     ReactDOM.render(
       React.createElement(SeatsApp, this._props),
@@ -93,77 +73,20 @@ console.log(`context`, context)
     ReactDOM.unmountComponentAtNode(this._container);
   }
 
-  private async _getSeatsDetails(): Promise<DetailsListItems> {
-    const errorMessage = 'Contact Your Administrator with Error: "FetchXML did not return Details List".';
-    const {
-      entityProperty,
-      sampleTrackerNumber,
-      platePositionNumber,
-      binLocation
-    } = this._context.parameters;
-
+  private async _initProps (): Promise<void> {
+    this._initColumns();
     try {
-      this._validateProperty(entityProperty, 'Entity Property');
-      this._validateProperty(sampleTrackerNumber, 'Sample Tracker Number');
-      this._validateProperty(platePositionNumber, 'Plate Position Number');
-      this._validateProperty(binLocation, 'Bin Location', true);
-    } catch(error) {
-      throw {
-        type: 'error',
-        text: `${errorMessage} Reason: "${error}"`
-      };
-    }
-
-    let fetchXML: string = "";
-    fetchXML += "<fetch mapping='logical'>";
-    fetchXML += `<entity name='${entityProperty.raw}'>`;
-    fetchXML += `<attribute name='${sampleTrackerNumber.raw}' />`;
-    fetchXML += `<attribute name='${platePositionNumber.raw}' />`;
-    fetchXML += "<filter>";
-    // @ts-ignore
-      fetchXML += `<condition attribute='${binLocation.attributes.LogicalName}' operator='not-null' />`;
-    fetchXML += "</filter>";
-    fetchXML += "</entity>";
-    fetchXML += "</fetch>";
-
-    let response: ComponentFramework.WebApi.RetrieveMultipleResponse;
-    try {
-      response = await this._context.webAPI.retrieveMultipleRecords(
-        // @ts-ignore
-        entityProperty.raw,
-        `?fetchXml=${encodeURIComponent(fetchXML)}`
-      );
-console.log(response)
-      return response.entities.map((entity, index) => ({
-        key: index,
-        // @ts-ignore
-        sampleTrackerNumber: entity[sampleTrackerNumber.raw],
-        // @ts-ignore
-        platePositionNumber: entity[platePositionNumber.raw] || null
-      }));
-    } catch(error) {
-console.log(`error`, error)
-      throw {
-        type: 'error',
-        text: `${errorMessage} Reason: "${error.title}"`
-      };
+      await Promise.all([
+        this._initDetailsList(),
+        this._initSeatsSchema()
+      ]);
+    } catch({ type, text }) {
+      this._props.message = { type, text };
     }
   }
 
-  private _validateProperty(property: any, name: string, isOptionSet: boolean = false): void {
-    if (!property || !(property instanceof Object)) {
-      throw `Unknown ${name}`;
-    }
-    if (
-      (!isOptionSet && typeof property.raw !== 'string' || property.raw === '') ||
-      (isOptionSet && typeof property.attributes?.LogicalName !== 'string')
-    ) {
-      throw `Incorrect ${name} Value`;
-    }
-  }
-
-  private _getColumns = (): DetailsListColumns => {
-    return [
+  private _initColumns (): void {
+    this._props.columns = [
       { key: 'sampleTrackerNumber', name: 'Sample Tracker Number', fieldName: 'sampleTrackerNumber' },
       { key: 'platePositionNumber', name: 'Plate Position Number', fieldName: 'platePositionNumber' }
     ].map(({ key, name, fieldName }) => ({
@@ -176,27 +99,166 @@ console.log(`error`, error)
     }));
   }
 
-  private _getSeatsSchema = () => {
-    return json;
+  private async _initDetailsList (): Promise<void> {
+    const errorMessage = 'Contact Your Administrator with Error: "FetchXML did not return Details List".';
+    const {
+      detailsEntity,
+      sampleTrackerNumber,
+      platePositionNumber,
+      binLocation
+    } = this._context.parameters;
+
+    try {
+      this._validateProperty(detailsEntity, 'Entity for Details List Property');
+      this._validateProperty(sampleTrackerNumber, 'Sample Tracker Number');
+      this._validateProperty(platePositionNumber, 'Plate Position Number');
+      this._validateProperty(binLocation, 'Bin Location', true);
+    } catch(error) {
+      throw {
+        type: 'error',
+        text: `${errorMessage} Reason: "${error}"`
+      };
+    }
+
+    let fetchXML: string = "";
+    fetchXML += "<fetch mapping='logical'>";
+    fetchXML += `<entity name='${detailsEntity.raw}'>`;
+    fetchXML += `<attribute name='${sampleTrackerNumber.raw}' />`;
+    fetchXML += `<attribute name='${platePositionNumber.raw}' />`;
+    fetchXML += "<filter>";
+    // @ts-ignore
+      fetchXML += `<condition attribute='${binLocation.attributes.LogicalName}' operator='not-null' />`;
+    fetchXML += "</filter>";
+    fetchXML += "</entity>";
+    fetchXML += "</fetch>";
+
+    const data = await this._fetchData(
+      // @ts-ignore
+      detailsEntity.raw,
+      fetchXML,
+      errorMessage
+    );
+
+    if (!data.length) {
+      throw {
+        type: 'warning',
+        text: 'No Samples to Load'
+      };
+    }
+
+    this._props.allItems = data.map((entity, index) => ({
+      key: index,
+      // @ts-ignore
+      sampleTrackerNumber: entity[sampleTrackerNumber.raw],
+      // @ts-ignore
+      platePositionNumber: entity[platePositionNumber.raw] || null
+    }));
   }
 
-  private _getFreeSeats = (seatsSchema: any): FreeSeatsIds => {
-    let freeSeatsIds: string[] = [];
+  private async _initSeatsSchema (): Promise<void> {
+    const errorMessage = 'Contact Your Administrator with Error: "FetchXML did not return Seats Schema".';
+    const {
+      schemaEntity,
+      schemaRowId,
+      schemaSeatName,
+      schemaSeatStatus
+    } = this._context.parameters;
 
-    seatsSchema.seats.sections.forEach(({ subsections }: { subsections: any }) => {
-      subsections.forEach(({ seats_by_rows }: { seats_by_rows: any }) => {
-        Object.keys(seats_by_rows).forEach(key => {
-          const row = seats_by_rows[key];
+    try {
+      this._validateProperty(schemaEntity, 'Entity for Seats Schema Property');
+      this._validateProperty(schemaRowId, 'Schema Row Id');
+      this._validateProperty(schemaSeatName, 'Schema Seat Name');
+      this._validateProperty(schemaSeatStatus, 'Schema Seat Status');
+    } catch(error) {
+      throw {
+        type: 'error',
+        text: `${errorMessage} Reason: "${error}"`
+      };
+    }
 
-          row.forEach((seat: any) => {
-            if (seat.status === 'free') {
-              freeSeatsIds.push(seat.name);
-            }
-          });
-        });
+    let fetchXML: string = "";
+    fetchXML += "<fetch mapping='logical'>";
+    fetchXML += `<entity name='${schemaEntity.raw}'>`;
+    fetchXML += `<attribute name='${schemaRowId.raw}' />`;
+    fetchXML += `<attribute name='${schemaSeatName.raw}' />`;
+    fetchXML += `<attribute name='${schemaSeatStatus.raw}' />`;
+    fetchXML += "</entity>";
+    fetchXML += "</fetch>";
+
+    const data = await this._fetchData(
+      // @ts-ignore
+      schemaEntity.raw,
+      fetchXML,
+      errorMessage
+    );
+
+    if (!data.length) {
+      throw {
+        type: 'warning',
+        text: 'No Seats Schema to Load'
+      };
+    }
+
+    const seatsByRows: any = {};
+
+    data.forEach(entity => {
+      // @ts-ignore
+      const rowId = entity[schemaRowId.raw];
+      // @ts-ignore
+      const seatName = entity[schemaSeatName.raw];
+      const seatStatus = entity[
+        `${schemaSeatStatus.raw}@OData.Community.Display.V1.FormattedValue`
+      ].toLowerCase();
+
+      if (!seatsByRows[rowId]) {
+        seatsByRows[rowId] = [];
+      }
+      seatsByRows[rowId].push({
+        name: seatName,
+        status: seatStatus
       });
+
+      if (seatStatus === 'free') {
+        this._props.allFreeSeatsIds.push(seatName);
+      }
     });
 
-    return freeSeatsIds;
+    this._props.seatsSchema = { seats: { sections: [{ subsections: [{ seats_by_rows: seatsByRows }] }] } };
+  }
+
+  private async _fetchData (
+    entityType: string,
+    fetchXML: string,
+    errorMessage: string
+  ): Promise<ComponentFramework.WebApi.Entity[]> {
+    let response: ComponentFramework.WebApi.RetrieveMultipleResponse;
+
+    try {
+      response = await this._context.webAPI.retrieveMultipleRecords(
+        entityType,
+        `?fetchXml=${encodeURIComponent(fetchXML)}`
+      );
+console.log(response)
+    } catch(error) {
+console.log(`error`, error)
+      throw {
+        type: 'error',
+        text: `${errorMessage} Reason: "${error.title || error}"`
+      };
+    }
+
+    return response.entities;
+  }
+
+  private _validateProperty (property: any, name: string, isOptionSet: boolean = false): void {
+    if (!property || !(property instanceof Object)) {
+      throw `Unknown ${name}`;
+    }
+    if (
+      (!isOptionSet && typeof property.raw !== 'string' || property.raw === '') ||
+      (isOptionSet && typeof property.attributes?.LogicalName !== 'string')
+    ) {
+      throw `Incorrect ${name} Value`;
+    }
   }
 }
