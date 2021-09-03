@@ -42,7 +42,7 @@ export class SeatsAppControl implements ComponentFramework.StandardControl<IInpu
         type: null
       }
     };
-console.log(`context`, context)
+
     await this._initProps();
 
     ReactDOM.render(
@@ -238,9 +238,7 @@ console.log(`context`, context)
         entityType,
         `?fetchXml=${encodeURIComponent(fetchXML)}`
       );
-console.log(response)
     } catch(error) {
-console.log(`error`, error)
       throw {
         type: 'error',
         text: `${errorMessage} Reason: "${error.title || error}"`

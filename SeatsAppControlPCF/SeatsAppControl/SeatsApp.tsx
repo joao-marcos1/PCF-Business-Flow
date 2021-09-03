@@ -23,23 +23,15 @@ const SeatsApp = ({
   allFreeSeatsIds,
   message
 }: Props) => {
-console.group('SeatApp');
-console.log('allItems :>> ', allItems);
-console.log('seatsSchema :>> ', seatsSchema);
-console.log('allFreeSeatsIds :>> ', allFreeSeatsIds);
-
   const isSeatsSchema = Boolean(Object.keys(seatsSchema).length);
   const [notification, setNotification] = useState<Message>(message);
-console.log('notification :>> ', notification);
+
   const [
     { items, freeSeatsIds, unavailableSeatsIds, selectedSeatsIds},
     setSelectedItems,
     selectSeats,
     deselectSeats
   ]: any = useSeatsReducer({ allItems, allFreeSeatsIds });
-console.log('items :>> ', items);
-console.log('unavailableSeatsIds :>> ', unavailableSeatsIds);
-console.log('selectedSeatsIds :>> ', selectedSeatsIds);
 
   const selection: Selection = new Selection({
     onSelectionChanged: () => setSelectedItems(selection.getSelection()),
@@ -49,7 +41,6 @@ console.log('selectedSeatsIds :>> ', selectedSeatsIds);
     setNotification({ type: null });
   };
 
-console.groupEnd();
   return (
     <Stack horizontal={false}>
       <div style={{ width: "50%" }}>
@@ -88,6 +79,6 @@ console.groupEnd();
       </Stack>
     </Stack>
   );
-}
+};
 
 export default SeatsApp;

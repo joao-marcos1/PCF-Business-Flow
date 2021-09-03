@@ -11,11 +11,8 @@ const MainStage = ({
   selectSeats,
   deselectSeats
 }) => {
-console.group("MainStage")
-console.log(`items`, items)
   const [size, containerRef] = useCalcSpace(500, 500);
-console.log(`size`, size)
-console.groupEnd()
+
   return (
     <div
       style={{

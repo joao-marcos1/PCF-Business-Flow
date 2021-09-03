@@ -19,9 +19,6 @@ const Popup = ({
   isSelected,
   onClose
 }) => {
-console.group("Popup")
-console.log(`number`, number)
-console.groupEnd()
   const containerRef = useRef(null);
   const clickLine = isFree ?
     'Click on the seat to select'

@@ -20,12 +20,8 @@ const StageChart = ({
   const [scaleToFit, setScaleToFit] = useState(1);
   const [virtualWidth, setVirtualWidth] = useState(1000);
   const [virtualOffset, setVirtualOffset] = useState(0);
-console.group("StageChart")
-console.log(`items`, items)
-console.log(`unavailableSeatsIds`, unavailableSeatsIds)
-console.log(`selectedSeatsIds`, selectedSeatsIds)
-console.groupEnd()
   const [popup, setPopup] = useState({ seat: null });
+
   // calculate initial scale
   useEffect(() => {
     if (!stageRef.current) {
@@ -55,9 +51,7 @@ console.groupEnd()
 
   const handleHover = useCallback((seat, pos) => {
     const item = items.find(item => item.platePositionNumber === seat);
-console.group("handleHover")
-console.log('item :>> ', item);
-console.groupEnd()
+
     setPopup({
       seat: seat,
       position: pos,

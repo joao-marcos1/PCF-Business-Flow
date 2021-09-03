@@ -39,8 +39,7 @@ const seatsReducer = (state, { type, payload }) => {
       const selectedItemsKeys = [];
       const unavailableSeatsIds = [];
       const selectedSeatsIds = [];
-console.group("SET_SELECTED_ITEMS")
-console.log(`payload`, payload)
+
       payload.items.forEach(item => {
         const isNotPreAssigned = preAssignedItemsKeys.indexOf(item.key) === -1;
         const hasValue = item.platePositionNumber !== null;
@@ -52,8 +51,7 @@ console.log(`payload`, payload)
           }
         }
       });
-console.log(`selectedItemsKeys`, selectedItemsKeys)
-console.log(`selectedSeatsIds`, selectedSeatsIds)
+
       Object.values(items).forEach(item => {
         const hasValue = item.platePositionNumber !== null;
         const isNotPreAssigned = preAssignedItemsKeys.indexOf(item.key) === -1;
@@ -63,8 +61,7 @@ console.log(`selectedSeatsIds`, selectedSeatsIds)
           unavailableSeatsIds.push(item.platePositionNumber);
         }
       });
-console.log(`unavailableSeatsIds`, unavailableSeatsIds)
-console.groupEnd()
+
       return {
         ...state,
         selectedItemsKeys,
@@ -73,8 +70,6 @@ console.groupEnd()
       };
     }
     case SELECT_SEATS: {
-console.group("SELECT_SEATS")
-console.log(`payload`, payload)
       const {
         items,
         selectedItemsKeys,
@@ -106,10 +101,7 @@ console.log(`payload`, payload)
           };
         }
       });
-console.log(`newItems`, newItems)
-console.log(`newFreeSeatIds`, newFreeSeatIds)
-console.log(`newSelectedSeatsIds`, newSelectedSeatsIds)
-console.groupEnd()
+
       return {
         ...state,
         items: newItems,
@@ -121,8 +113,6 @@ console.groupEnd()
       };
     }
     case DESELECT_SEATS: {
-console.group("DESELECT_SEATS")
-console.log(`payload`, payload)
       const { seatId } = payload;
       const {
         items,
@@ -136,10 +126,7 @@ console.log(`payload`, payload)
       newFreeSeatIds.push(seatId);
       newFreeSeatIds.sort((a, b) => order[a] - order[b]);
       newSelectedSeatsIds.splice(newSelectedSeatsIds.indexOf(seatId), 1);
-console.log(`item`, item)
-console.log(`newFreeSeatIds`, newFreeSeatIds)
-console.log(`newSelectedSeatsIds`, newSelectedSeatsIds)
-console.groupEnd()
+
       return {
         ...state,
         items: {
@@ -173,23 +160,14 @@ const useSeatsReducer = (initialState) => {
   ] = useReducer(seatsReducer, initialState, init);
 
   const setSelectedItems = items => {
-console.group("setSelectedItems action")
-console.log(`items`, items)
-console.groupEnd()
     dispatch({ type: SET_SELECTED_ITEMS, payload: { items } })
   };
 
   const selectSeats = seatId => {
-console.group("selectSeats action")
-console.log(`seatId`, seatId)
-console.groupEnd()
     dispatch({ type: SELECT_SEATS, payload: { seatId } });
   };
 
   const deselectSeats = seatId => {
-console.group("deselectSeats action")
-console.log(`seatId`, seatId)
-console.groupEnd()
     dispatch({ type: DESELECT_SEATS, payload: { seatId } });
   };
 

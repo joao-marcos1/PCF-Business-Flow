@@ -19,27 +19,22 @@ const SeatsDetailsList = ({
   items,
   columns,
   selection
-}: SeatsDetailsListProps) => {
-console.group('SeatsDetailsList');
-console.log('items :>> ', items);
-console.groupEnd();
-  return (
-    <div style={{ width: "50%" }}>
-      <MarqueeSelection selection={selection}>
-        <DetailsList
-          items={items}
-          columns={columns}
-          setKey="set"
-          layoutMode={DetailsListLayoutMode.justified}
-          selection={selection}
-          selectionPreservedOnEmptyClick={true}
-          ariaLabelForSelectionColumn="Toggle selection"
-          ariaLabelForSelectAllCheckbox="Toggle selection for all items"
-          checkButtonAriaLabel="select row"
-        />
-      </MarqueeSelection>
-    </div>
-  );
-}
+}: SeatsDetailsListProps) => (
+  <div style={{ width: "50%" }}>
+    <MarqueeSelection selection={selection}>
+      <DetailsList
+        items={items}
+        columns={columns}
+        setKey="set"
+        layoutMode={DetailsListLayoutMode.justified}
+        selection={selection}
+        selectionPreservedOnEmptyClick={true}
+        ariaLabelForSelectionColumn="Toggle selection"
+        ariaLabelForSelectAllCheckbox="Toggle selection for all items"
+        checkButtonAriaLabel="select row"
+      />
+    </MarqueeSelection>
+  </div>
+);
 
 export default SeatsDetailsList;
