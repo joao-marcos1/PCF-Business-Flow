@@ -2,10 +2,10 @@ import React from "react";
 import { Circle } from "../react-konva";
 import { SEAT_SIZE } from "../utils/layout";
 
-function getColor(isSelected, isBooked, isUnavailable) {
+function getColor(isSelected, isAutoBooked, isUnavailable) {
   if (isSelected) {
     return "green";
-  } else if (isBooked) {
+  } else if (isAutoBooked) {
     return "lightgrey";
   } else if (isUnavailable) {
     return "red";
@@ -17,20 +17,20 @@ function getColor(isSelected, isBooked, isUnavailable) {
 const Seat = ({
   x,
   y,
-  data,
+  data: { name, size, status },
   onHover,
   onSelect,
   onDeselect,
   isSelected,
   isUnavailable
 }) => {
-  const isBooked = data.status === "booked";
+  const isAutoBooked = status === "auto-booked";
 
   const handleMouseEnter = e => {
     e.target._clearCache();
-    onHover(data.name, e.target.getAbsolutePosition());
+    onHover(name, e.target.getAbsolutePosition());
     const container = e.target.getStage().container();
-    if (isBooked || isUnavailable) {
+    if (isAutoBooked || isUnavailable) {
       container.style.cursor = "not-allowed";
     } else {
       container.style.cursor = "pointer";
@@ -42,13 +42,13 @@ const Seat = ({
     container.style.cursor = "";
   };
   const handleClickTap = _ => {
-    if (isBooked || isUnavailable) {
+    if (isAutoBooked || isUnavailable) {
       return;
     }
     if (isSelected) {
-      onDeselect(data.name);
+      onDeselect(name);
     } else {
-      onSelect(data.name);
+      onSelect(name);
     }
   };
 
@@ -56,8 +56,8 @@ const Seat = ({
     <Circle
       x={x}
       y={y}
-      radius={SEAT_SIZE / 2}
-      fill={getColor(isSelected, isBooked, isUnavailable)}
+      radius={size === 'small' ? SEAT_SIZE / 2 : SEAT_SIZE}
+      fill={getColor(isSelected, isAutoBooked, isUnavailable)}
       strokeWidth={1}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

@@ -8,37 +8,90 @@ import SeatsDetailsList from './SeatsDetailsList';
 import MainStage from './MainStage';
 
 import { Stack } from '@fluentui/react/lib/Stack';
+import { Overlay } from '@fluentui/react/lib/Overlay';
+import { Spinner, SpinnerSize } from '@fluentui/react/lib/Spinner';
 import { PrimaryButton } from '@fluentui/react/lib/Button';
+import { Dropdown, IDropdownOption } from '@fluentui/react/lib/Dropdown';
 import { Selection } from '@fluentui/react/lib/DetailsList';
 import { mergeStyles } from '@fluentui/react/lib/Styling';
 
-const confirmButtonClass = mergeStyles({
-  marginTop: '20px'
+const panelClass = mergeStyles({
+  padding: '20px 20px 0'
+});
+const spinnerClass = mergeStyles({
+  marginTop: '20vh'
 });
 
 const SeatsApp = ({
   allItems,
   columns,
   seatsSchema,
-  allFreeSeatsIds,
-  message
+  allChangeableSeatsNames,
+  message,
+  saveData
 }: Props) => {
-  const isSeatsSchema = Boolean(Object.keys(seatsSchema).length);
+console.group("SeatsApp params")
+console.log('seatsSchema', seatsSchema)
   const [notification, setNotification] = useState<Message>(message);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   const [
-    { items, freeSeatsIds, unavailableSeatsIds, selectedSeatsIds},
+    {
+      items,
+      schemaSection,
+      stateSection,
+      sectionName,
+      allSections,
+      dataToSave
+    },
+    setSectionName,
     setSelectedItems,
     selectSeats,
-    deselectSeats
-  ]: any = useSeatsReducer({ allItems, allFreeSeatsIds });
-
-  const selection: Selection = new Selection({
+    deselectSeats,
+    resetDataToSave
+  ]: any = useSeatsReducer({ allItems, seatsSchema, allChangeableSeatsNames });
+  const [sectionKey, setSectionKey] = useState(allSections[0]?.key);
+console.log('items', items)
+console.log('schemaSection', schemaSection)
+console.log('stateSection', stateSection)
+console.log('sectionName', sectionName)
+console.log('dataToSave', dataToSave)
+console.groupEnd()
+  const [selection]: any = useState(new Selection({
     onSelectionChanged: () => setSelectedItems(selection.getSelection()),
-  });
+  }));
 
   const onNotificationDismiss = () => {
     setNotification({ type: null });
+  };
+  const handleSectionChange = (
+    event: React.FormEvent<HTMLDivElement>,
+    option?: IDropdownOption
+  ): void => {
+console.group('handleSectionChange');
+console.log('option :>> ', option);
+console.log('sectionKey :>> ', sectionKey);
+console.groupEnd();
+    if (option?.key !== sectionKey) {
+      setSectionKey(option?.key);
+      setSectionName(option?.text || null);
+      setSelectedItems([]);
+      selection.setAllSelected(false);
+    }
+  };
+
+  const handleConfirmClick = async () => {
+    setIsSaving(true);
+    onNotificationDismiss();
+
+    try {
+      await saveData(dataToSave);
+      resetDataToSave();
+    } catch (error) {
+      setNotification(error as Message);
+    }
+
+    setIsSaving(false);
   };
 
   return (
@@ -51,32 +104,54 @@ const SeatsApp = ({
             text={notification.text}
             handleOnDismiss={onNotificationDismiss}
           />}
-        <PrimaryButton
-          text="Confirm"
-          // onClick={_alertClicked}
-          // allowDisabledFocus
-          disabled={true}
-          className={confirmButtonClass}
-        />
+        <Stack
+          horizontal
+          horizontalAlign='space-between'
+          className={panelClass}
+        >
+          <PrimaryButton
+            text='Confirm'
+            onClick={handleConfirmClick}
+            disabled={(
+              !Object.keys(dataToSave.items).length ||
+              !Object.keys(dataToSave.seats).length
+            )}
+          />
+          <Dropdown
+            selectedKey={sectionKey}
+            onChange={handleSectionChange}
+            placeholder='Select a section'
+            options={allSections}
+            disabled={!sectionName}
+          />
+        </Stack>
       </div>
       <Stack horizontal>
         <SeatsDetailsList
           items={items}
           columns={columns}
           selection={selection}
+          sectionName={sectionName}
         />
-        {isSeatsSchema ?
+        {sectionName ?
           <MainStage
-            seatsSchema={seatsSchema}
+            schema={[schemaSection]}
             items={items}
-            freeSeatsIds={freeSeatsIds}
-            unavailableSeatsIds={unavailableSeatsIds}
-            selectedSeatsIds={selectedSeatsIds}
+            sectionName={sectionName}
+            state={stateSection}
             selectSeats={selectSeats}
             deselectSeats={deselectSeats}
           />
         : null}
       </Stack>
+      {isSaving && (
+        <Overlay isDarkThemed={true}>
+          <Spinner
+            size={SpinnerSize.large}
+            className={spinnerClass}
+          />
+        </Overlay>
+      )}
     </Stack>
   );
 };

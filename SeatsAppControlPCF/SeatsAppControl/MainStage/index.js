@@ -3,16 +3,25 @@ import StageChart from './components/StageChart';
 import useCalcSpace from './utils/useCalcSpace';
 
 const MainStage = ({
-  seatsSchema,
+  schema,
   items,
-  freeSeatsIds,
-  unavailableSeatsIds,
-  selectedSeatsIds,
+  sectionName,
+  state: {
+    freeSeats: { names: freeSeatsNames },
+    unavailableSeatsNames,
+    selectedSeatsNames
+  },
   selectSeats,
   deselectSeats
 }) => {
   const [size, containerRef] = useCalcSpace(500, 500);
-
+console.group("MainStage")
+console.log(`schema`, schema)
+console.log(`sectionName`, sectionName)
+console.log(`freeSeatsNames`, freeSeatsNames)
+console.log(`unavailableSeatsNames`, unavailableSeatsNames)
+console.log(`selectedSeatsNames`, selectedSeatsNames)
+console.groupEnd()
   return (
     <div
       style={{
@@ -25,11 +34,13 @@ const MainStage = ({
     >
       <StageChart
         size={size}
-        seats={seatsSchema.seats}
+        orientation='vertical'
+        schema={schema}
         items={items}
-        freeSeatsIds={freeSeatsIds}
-        unavailableSeatsIds={unavailableSeatsIds}
-        selectedSeatsIds={selectedSeatsIds}
+        sectionName={sectionName}
+        freeSeatsNames={freeSeatsNames}
+        unavailableSeatsNames={unavailableSeatsNames}
+        selectedSeatsNames={selectedSeatsNames}
         selectSeats={selectSeats}
         deselectSeats={deselectSeats}
       />

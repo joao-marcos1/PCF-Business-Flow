@@ -13,7 +13,7 @@ const isClickedInside = (e, element) => {
 
 const Popup = ({
   position,
-  seatId,
+  seatName,
   number,
   isFree,
   isSelected,
@@ -53,7 +53,7 @@ const Popup = ({
         backgroundColor: "white"
       }}
     >
-      <div>Seat {seatId}</div>
+      <div>Seat {seatName}</div>
       {number ?
         <div>{number}</div>
       : null}

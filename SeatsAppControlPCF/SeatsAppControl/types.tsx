@@ -2,6 +2,7 @@ interface DetailsListItem {
   key: number;
   sampleTrackerNumber: string;
   platePositionNumber: string | null;
+  section: string | null;
 };
 
 export type DetailsListItems = DetailsListItem[];
@@ -25,7 +26,8 @@ export interface Message {
 export interface Props {
   allItems: DetailsListItems;
   columns: DetailsListColumns;
-  seatsSchema: {};
-  allFreeSeatsIds: string[];
-  message: Message
+  seatsSchema: any;
+  allChangeableSeatsNames: any;
+  message: Message;
+  saveData: (ids: string[]) => void;
 };

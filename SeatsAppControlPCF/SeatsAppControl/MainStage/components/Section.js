@@ -5,20 +5,22 @@ import SubSection from './SubSection';
 import {
   SECTION_TOP_PADDING,
   getSectionWidth,
+  getSectionHeight,
   getSubsectionWidth,
+  getSubsectionHeight,
 } from '../utils/layout';
 
 export default memo(
   ({
     section,
-    height,
     x,
     y,
+    orientation,
     onHoverSeat,
     onSelectSeat,
     onDeselectSeat,
-    selectedSeatsIds,
-    unavailableSeatsIds
+    selectedSeatsNames,
+    unavailableSeatsNames
   }) => {
     const containerRef = useRef();
 
@@ -26,10 +28,15 @@ export default memo(
     // we just need to recache on some changes
     useEffect(() => {
       containerRef.current.cache();
-    }, [section, selectedSeatsIds]);
+    }, [section, selectedSeatsNames]);
 
-    const width = getSectionWidth(section);
-    let lastSubsectionX = 0;
+    const width = getSectionWidth(section, orientation);
+    const height = getSectionHeight(section, orientation);
+    let lastSubsectionDimension = (
+      orientation === 'horizontal' ?
+        0
+      : SECTION_TOP_PADDING
+    );
 
     return (
       <Group y={y} x={x} ref={containerRef}>
@@ -42,24 +49,40 @@ export default memo(
           cornerRadius={5}
         />
         {section.subsections.map((subsection, index) => {
-          const subWidth = getSubsectionWidth(subsection);
-          const pos = lastSubsectionX;
+          const subDimension = (
+            orientation === 'horizontal' ?
+              getSubsectionWidth(subsection)
+            : getSubsectionHeight(subsection)
+          );
+          const pos = lastSubsectionDimension;
 
-          lastSubsectionX += subWidth;
+          lastSubsectionDimension += subDimension;
+
+          let subX = pos;
+          let subY = SECTION_TOP_PADDING;
+          let subWidth = subDimension;
+          let subHeight = height;
+
+          if (orientation === 'vertical') {
+            subX = 0;
+            subY = pos;
+            subWidth = width;
+            subHeight = subDimension;
+          }
 
           return (
             <SubSection
-              x={pos}
-              y={SECTION_TOP_PADDING}
+              x={subX}
+              y={subY}
               key={index}
               data={subsection}
               width={subWidth}
-              height={height}
+              height={subHeight}
               onHoverSeat={onHoverSeat}
               onSelectSeat={onSelectSeat}
               onDeselectSeat={onDeselectSeat}
-              selectedSeatsIds={selectedSeatsIds}
-              unavailableSeatsIds={unavailableSeatsIds}
+              selectedSeatsNames={selectedSeatsNames}
+              unavailableSeatsNames={unavailableSeatsNames}
             />
           );
         })}

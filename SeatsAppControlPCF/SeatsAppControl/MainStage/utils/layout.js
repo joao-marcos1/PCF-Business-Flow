@@ -6,32 +6,94 @@ export const SECTIONS_MARGIN = 10;
 export const SECTION_TOP_PADDING = 40;
 
 export const getSubsectionWidth = subsection => {
-  const rows = Object.keys(subsection.seats_by_rows);
-  const maxRows = Math.max(
-    ...rows.map(r => Object.keys(subsection.seats_by_rows[r]).length)
-  );
-  return SEATS_DISTANCE * maxRows + SUBSECTION_PADDING * 2;
+  const [placesX] = getSeatsPlaces(subsection.seats_by_rows);
+
+  return placesX[placesX.length - 1] + SUBSECTION_PADDING * 2;
 };
 
 export const getSubsectionHeight = subsection => {
-  const rows = Object.keys(subsection.seats_by_rows);
-  return SEATS_DISTANCE * rows.length + SUBSECTION_PADDING * 2;
+  const [, placesY] = getSeatsPlaces(subsection.seats_by_rows);
+
+  return placesY.reduce((sum, place) => sum + place, 0) + SUBSECTION_PADDING * 2;
 };
 
-export const getSectionWidth = section => {
-  const width = section.subsections.reduce((sum, subsection) => {
-    return sum + getSubsectionWidth(subsection);
-  }, 0);
-  return width;
-};
+export const getSectionWidth = (section, orientation = 'horizontal') => {
+  const subsectionsWidth = section.subsections.map(getSubsectionWidth);
 
-export const getSectionHeight = section => {
   return (
-    Math.max(...section.subsections.map(getSubsectionHeight)) +
-    SECTION_TOP_PADDING
+    orientation === 'horizontal' ?
+      subsectionsWidth.reduce((sum, width) => sum + width, 0)
+    : Math.max(...subsectionsWidth)
   );
 };
 
-export const getMaximimSectionWidth = sections => {
-  return Math.max(...sections.map(getSectionWidth));
+export const getSectionHeight = (section, orientation = 'horizontal') => {
+  const subsectionsHeight = section.subsections.map(getSubsectionHeight);
+
+  return (
+    (
+      orientation === 'horizontal' ?
+        Math.max(...subsectionsHeight)
+      : subsectionsHeight.reduce((sum, height) => sum + height, 0)
+    )  + SECTION_TOP_PADDING
+  );
+};
+
+export const getMaximumSectionWidth = (sections, orientation = 'horizontal') => {
+  return Math.max(...sections.map(section => getSectionWidth(section, orientation)));
+};
+
+export const getSeatsPlaces = (rows) => {
+  let placesX = [];
+  let placesY = [];
+  let placeX = 0;
+  let placeY = 0;
+  let prevSizeX = 'small';
+  let prevSizeY = 'small';
+
+  Object
+    .keys(rows)
+    .forEach((rowKey, rowIndex) => {
+      rows[rowKey].forEach(({ size }, index) => {
+        if (placesY[rowIndex] !== 'big') {
+          placesY[rowIndex] = size;
+        }
+        if (placesX[index] !== 'big') {
+          placesX[index] = size;
+        }
+      })
+    });
+
+  placesX = placesX.map(size => {
+    if (size === 'small' && prevSizeX === 'small') {
+      placeX += SEATS_DISTANCE;
+    } else if (
+      (size === 'big' && prevSizeX === 'small') ||
+      (size === 'small' && prevSizeX === 'big')
+    ) {
+      placeX += SEAT_SIZE * 2;
+    } else if (size === 'big' && prevSizeX === 'big') {
+      placeX += SEAT_SIZE + SEATS_DISTANCE;
+    }
+    prevSizeX = size;
+
+    return placeX;
+  });
+  placesY = placesY.map(size => {
+    if (size === 'small' && prevSizeY === 'small') {
+      placeY += SEATS_DISTANCE;
+    } else if (
+      (size === 'big' && prevSizeY === 'small') ||
+      (size === 'small' && prevSizeY === 'big')
+    ) {
+      placeY += SEAT_SIZE * 2;
+    } else if (size === 'big' && prevSizeY === 'big') {
+      placeY += SEAT_SIZE + SEATS_DISTANCE;
+    }
+    prevSizeY = size;
+
+    return placeY;
+  });
+
+  return [placesX, placesY];
 };

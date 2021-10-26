@@ -6,11 +6,13 @@ import * as layout from '../utils/layout';
 
 const StageChart = ({
   size,
-  seats,
+  orientation = 'horizontal',
+  schema,
   items,
-  freeSeatsIds,
-  unavailableSeatsIds,
-  selectedSeatsIds,
+  sectionName,
+  freeSeatsNames,
+  unavailableSeatsNames,
+  selectedSeatsNames,
   selectSeats,
   deselectSeats
 }) => {
@@ -50,16 +52,19 @@ const StageChart = ({
   let lastSectionPosition = 0;
 
   const handleHover = useCallback((seat, pos) => {
-    const item = items.find(item => item.platePositionNumber === seat);
+    const item = items.find(
+      item => item.platePositionNumber === seat && item.section === sectionName
+    );
 
     setPopup({
       seat: seat,
       position: pos,
+      section: sectionName,
       number: item && item.sampleTrackerNumber
     });
-  }, [items]);
+  }, [items, sectionName]);
 
-  const maxSectionWidth = layout.getMaximimSectionWidth(seats.sections);
+  const maxSectionWidth = layout.getMaximumSectionWidth(schema, orientation);
 
   return (
     <>
@@ -83,23 +88,22 @@ const StageChart = ({
         x={virtualOffset}
       >
         <Layer>
-          {seats.sections.map((section, index) => {
-            const height = layout.getSectionHeight(section);
+          {schema.map((section, index) => {
+            const height = layout.getSectionHeight(section, orientation);
             const position = lastSectionPosition + layout.SECTIONS_MARGIN;
             lastSectionPosition = position + height;
-            const width = layout.getSectionWidth(section);
-
+            const width = layout.getSectionWidth(section, orientation);
             const offset = (maxSectionWidth - width) / 2;
 
             return (
               <Section
                 x={offset}
                 y={position}
-                height={height}
+                orientation={orientation}
                 key={index}
                 section={section}
-                selectedSeatsIds={selectedSeatsIds}
-                unavailableSeatsIds={unavailableSeatsIds}
+                selectedSeatsNames={selectedSeatsNames}
+                unavailableSeatsNames={unavailableSeatsNames}
                 onHoverSeat={handleHover}
                 onSelectSeat={selectSeats}
                 onDeselectSeat={deselectSeats}
@@ -112,10 +116,14 @@ const StageChart = ({
       {popup.seat && (
         <SeatPopup
           position={popup.position}
-          seatId={popup.seat}
+          seatName={popup.seat}
           number={popup.number}
-          isFree={freeSeatsIds.indexOf(popup.seat) !== -1}
-          isSelected={selectedSeatsIds.indexOf(popup.seat) !== -1}
+          isFree={(
+            freeSeatsNames[popup.seat.split('-')[0]] ?
+              freeSeatsNames[popup.seat.split('-')[0]].indexOf(popup.seat) !== -1
+            : false
+          )}
+          isSelected={selectedSeatsNames.indexOf(popup.seat) !== -1}
           onClose={() => {
             setPopup({ seat: null });
           }}
